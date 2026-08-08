@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Анкета генеалогического исследования — Родословное бюро Евгения Кравченко</title>
+<style>
+:root{
+  --ink:#20242c; --ink-2:#4a5260; --muted:#8b93a1;
+  --paper:#faf8f4; --card:#ffffff; --line:#e3ddd2;
+  --accent:#8c2f39; --accent-soft:#f6ecec;
+  --gold:#b08b4f; --green:#3d7a52; --amber:#b07a1f;
+  --r:12px; --shadow:0 1px 2px rgba(32,36,44,.06), 0 8px 24px rgba(32,36,44,.06);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:"Georgia","Iowan Old Style","Times New Roman",serif;
+  background:var(--paper); color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+}
+.ui{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+
+/* ---------- layout ---------- */
+header.top{
+  background:linear-gradient(180deg,#fffdf9,#f6f1e8);
+  border-bottom:1px solid var(--line);
+  padding:22px 28px 18px;
+}
+.wrap{max-width:1180px;margin:0 auto}
+.brand{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.brand h1{font-size:23px;margin:0;letter-spacing:.2px;font-weight:600}
+.brand .sub{font-size:13px;color:var(--muted);font-family:-apple-system,sans-serif}
+.lead{margin:10px 0 0;font-size:15px;color:var(--ink-2);max-width:760px;line-height:1.55}
+
+/* progress */
+nav.steps{margin-top:18px;display:flex;gap:6px;flex-wrap:wrap}
+nav.steps button{
+  font-family:-apple-system,sans-serif;font-size:12.5px;
+  border:1px solid var(--line);background:#fff;color:var(--ink-2);
+  padding:7px 12px;border-radius:99px;cursor:pointer;transition:.15s;
+  display:flex;align-items:center;gap:7px;
+}
+nav.steps button:hover{border-color:var(--gold)}
+nav.steps button.active{background:var(--ink);border-color:var(--ink);color:#fff}
+nav.steps button .dot{width:6px;height:6px;border-radius:99px;background:var(--line)}
+nav.steps button.done .dot{background:var(--green)}
+nav.steps button.active .dot{background:#fff}
+
+main{padding:26px 28px 90px}
+.panel{display:none;animation:fade .25s ease}
+.panel.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+h2.sec{font-size:20px;margin:0 0 6px;font-weight:600}
+p.hint{font-family:-apple-system,sans-serif;font-size:13.5px;color:var(--muted);margin:0 0 20px;line-height:1.5;max-width:720px}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px 22px;margin-bottom:16px;box-shadow:var(--shadow)}
+.card h3{font-size:15px;margin:0 0 14px;font-weight:600;font-family:-apple-system,sans-serif}
+
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:1fr 1fr}
+.g3{grid-template-columns:1fr 1fr 1fr}
+@media(max-width:820px){.g2,.g3{grid-template-columns:1fr}}
+
+label.f{display:block;font-family:-apple-system,sans-serif;font-size:12.5px;color:var(--ink-2);margin-bottom:5px;font-weight:500}
+input[type=text],input[type=email],input[type=tel],input[type=number],select,textarea{
+  width:100%;font-family:-apple-system,sans-serif;font-size:14px;color:var(--ink);
+  padding:9px 11px;border:1px solid var(--line);border-radius:8px;background:#fff;outline:none;transition:.15s;
+}
+input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(176,139,79,.13)}
+textarea{min-height:88px;resize:vertical;line-height:1.5}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{
+  font-family:-apple-system,sans-serif;font-size:13px;
+  border:1px solid var(--line);background:#fff;border-radius:99px;padding:8px 14px;cursor:pointer;
+  user-select:none;transition:.15s;color:var(--ink-2)
+}
+.chip:hover{border-color:var(--gold)}
+.chip.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:500}
+
+.checks{display:grid;gap:9px;grid-template-columns:1fr 1fr}
+@media(max-width:820px){.checks{grid-template-columns:1fr}}
+.check{display:flex;gap:9px;align-items:flex-start;font-family:-apple-system,sans-serif;font-size:13.5px;color:var(--ink-2);cursor:pointer;line-height:1.4}
+.check input{margin-top:2px;accent-color:var(--accent);width:15px;height:15px;flex:none}
+
+/* ---------- tree ---------- */
+.treebar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.btn{
+  font-family:-apple-system,sans-serif;font-size:13.5px;font-weight:500;
+  border:1px solid var(--line);background:#fff;color:var(--ink);
+  padding:9px 16px;border-radius:8px;cursor:pointer;transition:.15s;
+}
+.btn:hover{border-color:var(--ink-2)}
+.btn.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+.btn.primary:hover{background:#000}
+.btn.accent{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn.ghost{background:transparent}
+.btn:disabled{opacity:.4;cursor:default}
+
+.treewrap{
+  background:#fffdfa;border:1px solid var(--line);border-radius:var(--r);
+  overflow:auto;padding:18px;box-shadow:var(--shadow);position:relative;max-height:640px
+}
+#stage{position:relative}
+#links{position:absolute;inset:0;pointer-events:none;overflow:visible}
+.node{
+  position:absolute;width:196px;box-sizing:border-box;
+  background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 11px;
+  cursor:pointer;transition:.15s;font-family:-apple-system,sans-serif;
+}
+.node:hover{border-color:var(--gold);box-shadow:0 4px 14px rgba(32,36,44,.09);transform:translateY(-1px)}
+.node .role{font-size:10.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted)}
+.node .nm{font-size:13.5px;font-weight:600;margin-top:2px;line-height:1.25;color:var(--ink)}
+.node .meta{font-size:11.5px;color:var(--ink-2);margin-top:3px;line-height:1.3}
+.node.empty{border-style:dashed;background:#fdfcfa}
+.node.empty .nm{color:var(--muted);font-weight:500}
+.node.self{border-color:var(--ink);border-width:1.5px}
+.node.target{border-color:var(--accent);background:var(--accent-soft)}
+.node .flag{display:inline-block;font-size:10px;color:var(--accent);font-weight:700;letter-spacing:.4px;margin-top:4px}
+.node.f::before,.node.m::before{content:'';position:absolute;left:0;top:10px;bottom:10px;width:3px;border-radius:99px}
+.node.f::before{background:#5a7fa8}
+.node.m::before{background:#b07a9a}
+
+/* modal */
+.mask{position:fixed;inset:0;background:rgba(24,26,32,.42);backdrop-filter:blur(2px);display:none;align-items:center;justify-content:center;z-index:50;padding:20px}
+.mask.on{display:flex}
+.modal{background:#fff;border-radius:14px;width:min(640px,100%);max-height:88vh;overflow:auto;box-shadow:0 24px 70px rgba(0,0,0,.28)}
+.modal .mh{padding:18px 22px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#fff;z-index:2}
+.modal .mh b{font-size:16px}
+.modal .mh span{font-family:-apple-system,sans-serif;font-size:12px;color:var(--muted);display:block;margin-top:2px}
+.modal .mb{padding:20px 22px}
+.modal .mf{padding:14px 22px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:space-between;position:sticky;bottom:0;background:#fff}
+.x{border:none;background:none;font-size:24px;line-height:1;color:var(--muted);cursor:pointer;padding:0 4px}
+
+/* result */
+.verdict{border-radius:var(--r);padding:20px 22px;border:1px solid var(--line);margin-bottom:16px}
+.verdict.green{background:#f1f7f3;border-color:#c6ddce}
+.verdict.amber{background:#fdf6ea;border-color:#e7d3ac}
+.verdict.red{background:#fbf0f1;border-color:#e5c3c6}
+.verdict .zone{font-family:-apple-system,sans-serif;font-size:11.5px;letter-spacing:1.2px;text-transform:uppercase;font-weight:700}
+.verdict.green .zone{color:var(--green)} .verdict.amber .zone{color:var(--amber)} .verdict.red .zone{color:var(--accent)}
+.verdict h4{margin:6px 0 8px;font-size:19px;font-weight:600}
+.verdict p{margin:0;font-family:-apple-system,sans-serif;font-size:14px;line-height:1.6;color:var(--ink-2)}
+.kv{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin:16px 0 0}
+@media(max-width:820px){.kv{grid-template-columns:1fr}}
+.kv div{background:#fff;border:1px solid var(--line);border-radius:10px;padding:13px 15px}
+.kv .k{font-family:-apple-system,sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted)}
+.kv .v{font-size:16px;font-weight:600;margin-top:4px}
+ul.notes{font-family:-apple-system,sans-serif;font-size:13.5px;color:var(--ink-2);line-height:1.65;padding-left:20px;margin:10px 0 0}
+pre.sum{
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;line-height:1.6;
+  background:#fffdfa;border:1px solid var(--line);border-radius:10px;padding:16px;white-space:pre-wrap;
+  max-height:340px;overflow:auto;color:var(--ink-2)
+}
+.foot{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.disc{font-family:-apple-system,sans-serif;font-size:12px;padding-top:4px;color:var(--muted);line-height:1.55;margin-top:14px}
+
+.navbar{
+  position:fixed;left:0;right:0;bottom:0;background:rgba(250,248,244,.94);backdrop-filter:blur(8px);
+  border-top:1px solid var(--line);padding:12px 28px;z-index:20
+}
+.navbar .wrap{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.navbar .pg{font-family:-apple-system,sans-serif;font-size:12.5px;color:var(--muted)}
+.toast{
+  position:fixed;bottom:78px;left:50%;transform:translateX(-50%) translateY(10px);opacity:0;
+  background:var(--ink);color:#fff;font-family:-apple-system,sans-serif;font-size:13px;
+  padding:10px 18px;border-radius:99px;transition:.25s;pointer-events:none;z-index:60
+}
+.toast.on{opacity:1;transform:translateX(-50%)}
+@media print{
+  nav.steps,.navbar,.treebar,.foot,.x{display:none!important}
+  .panel{display:block!important}
+  body{background:#fff}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand">
+      <h1>Анкета генеалогического исследования</h1>
+      <span class="sub">Родословное бюро Евгения Кравченко</span>
+    </div>
+    <p class="lead">Заполните то, что знаете — даже если это два имени и название деревни. Анкета нужна, чтобы оценить <b>возможность</b> поиска, <b>срок</b> и <b>стоимость</b> до начала работы. Пустые поля — нормально: часть из них мы заполним вместе на созвоне.</p>
+    <nav class="steps" id="steps"></nav>
+  </div>
+</header>
+
+<main><div class="wrap">
+
+  <!-- 1 -->
+  <section class="panel on" data-step="0">
+    <h2 class="sec">Кто вы и как с вами связаться</h2>
+    <p class="hint">Контакты нужны только для ответа по вашему запросу. Данные не передаются третьим лицам — см. соглашение о конфиденциальности.</p>
+    <div class="card">
+      <div class="grid g2">
+        <div><label class="f">Ваше имя и фамилия</label><input type="text" data-b="c.name" placeholder="Артём Чорня"></div>
+        <div><label class="f">Город, где вы живёте</label><input type="text" data-b="c.city" placeholder="Тюмень"></div>
+        <div><label class="f">Телефон / мессенджер</label><input type="tel" data-b="c.phone" placeholder="+7 ..."></div>
+        <div><label class="f">Электронная почта</label><input type="email" data-b="c.email" placeholder="you@mail.ru"></div>
+      </div>
+      <div style="margin-top:16px"><label class="f">Как удобнее общаться</label>
+        <div class="chips" data-chips="c.channel" data-single="1">
+          <div class="chip" data-v="Telegram">Telegram</div><div class="chip" data-v="WhatsApp">WhatsApp</div>
+          <div class="chip" data-v="Звонок">Звонок</div><div class="chip" data-v="Почта">Почта</div>
+          <div class="chip" data-v="Видеосозвон">Видеосозвон</div>
+        </div>
+      </div>
+      <div style="margin-top:16px"><label class="f">Откуда вы о нас узнали (необязательно)</label><input type="text" data-b="c.source" placeholder="рекомендация, соцсети, поиск..."></div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section class="panel" data-step="1">
+    <h2 class="sec">Что вы хотите узнать</h2>
+    <p class="hint">Можно выбрать несколько. От формулировки задачи зависит и стоимость, и то, в какие архивы мы вообще пойдём.</p>
+    <div class="card">
+      <h3>Формат исследования</h3>
+      <div class="chips" data-chips="g.type">
+        <div class="chip" data-v="Восстановить род в глубину">Восстановить род в глубину</div>
+        <div class="chip" data-v="Одна конкретная линия/фамилия">Одна конкретная линия / фамилия</div>
+        <div class="chip" data-v="Боевой путь, репрессии, «Путь»">Боевой путь, репрессии</div>
+        <div class="chip" data-v="Точечная проверка документа">Точечная проверка документа</div>
+        <div class="chip" data-v="Найти живых родственников">Найти живых родственников</div>
+        <div class="chip" data-v="Родословная книга / оформление">Родословная книга, оформление</div>
+        <div class="chip" data-v="Пока не знаю, нужна консультация">Пока не знаю, нужна консультация</div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Своими словами</h3>
+      <label class="f">Главный вопрос, ответ на который вы хотите получить</label>
+      <textarea data-b="g.question" placeholder="Например: откуда пришли Чорни, кем были до 1917 года, и почему прадед оказался в Сибири"></textarea>
+      <div class="grid g2" style="margin-top:16px">
+        <div><label class="f">Есть ли дата, к которой нужен результат</label><input type="text" data-b="g.deadline" placeholder="юбилей отца в мае / не горит"></div>
+        <div><label class="f">Ориентир по бюджету</label>
+          <select data-b="g.budget">
+            <option value="">— не определился —</option>
+            <option>до 20 000 ₽ — точечная проверка</option>
+            <option>30 000 – 70 000 ₽ — одна линия</option>
+            <option>70 000 – 150 000 ₽ — несколько линий</option>
+            <option>от 150 000 ₽ — полное исследование рода</option>
+            <option>от 300 000 ₽ — исследование + родословная книга</option>
+          </select>
+        </div>
+      </div>
+      <div style="margin-top:16px"><label class="f">Что уже делали до нас</label>
+        <div class="chips" data-chips="g.prior">
+          <div class="chip" data-v="Ничего">Ничего</div>
+          <div class="chip" data-v="Опрашивал родственников">Опрашивал родственников</div>
+          <div class="chip" data-v="Искал в интернете и базах">Искал в интернете и базах</div>
+          <div class="chip" data-v="Писал запросы в архивы">Писал запросы в архивы</div>
+          <div class="chip" data-v="Делал ДНК-тест">Делал ДНК-тест</div>
+          <div class="chip" data-v="Работал с другим генеалогом">Работал с другим генеалогом</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 — ДРЕВО -->
+  <section class="panel" data-step="2">
+    <h2 class="sec">Ваше древо</h2>
+    <p class="hint">Нажмите на карточку, чтобы вписать человека. Начните с себя и идите вглубь, пока помните. Отметьте <b>ключевую линию</b> — ту, ради которой всё затевается. Незаполненные ячейки — это и есть предмет поиска.</p>
+    <div class="treebar">
+      <button class="btn" id="addGen">Показать ещё поколение</button>
+      <button class="btn ghost" id="delGen">Убрать поколение</button>
+      <span class="pg ui" id="treeStat" style="font-size:12.5px;color:var(--muted)"></span>
+    </div>
+    <div class="treewrap"><div id="stage"><svg id="links"></svg></div></div>
+    <div class="card" style="margin-top:16px">
+      <h3>Побочные ветви и родственники вне прямой линии</h3>
+      <label class="f">Братья, сёстры, дяди, тёти, двоюродные — всё, что не помещается в схему выше</label>
+      <textarea data-b="t.extra" placeholder="У прадеда было два брата, один уехал в Харбин..."></textarea>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section class="panel" data-step="3">
+    <h2 class="sec">География и обстоятельства</h2>
+    <p class="hint">Место — главное для генеалогии. Один и тот же поиск в Тюменской области и в Черниговской губернии — это разные деньги и разные сроки.</p>
+    <div class="card">
+      <h3>Места, связанные с родом</h3>
+      <label class="f">Населённые пункты, районы, губернии — как помните, даже неточно</label>
+      <textarea data-b="p.places" placeholder="с. Романово, Курганский уезд, Тобольская губерния; г. Черкассы"></textarea>
+      <div class="grid g2" style="margin-top:16px">
+        <div><label class="f">Страны, где предположительно жили предки</label>
+          <div class="chips" data-chips="p.countries">
+            <div class="chip" data-v="Россия">Россия</div><div class="chip" data-v="Украина">Украина</div>
+            <div class="chip" data-v="Беларусь">Беларусь</div><div class="chip" data-v="Казахстан">Казахстан</div>
+            <div class="chip" data-v="Молдова">Молдова</div><div class="chip" data-v="Польша">Польша</div>
+            <div class="chip" data-v="Прибалтика">Прибалтика</div><div class="chip" data-v="Кавказ">Кавказ</div>
+            <div class="chip" data-v="Не знаю">Не знаю</div>
+          </div>
+        </div>
+        <div><label class="f">Насколько точно известно место</label>
+          <select data-b="p.precision">
+            <option value="">— выберите —</option>
+            <option>Знаю конкретное село или деревню</option>
+            <option>Знаю уезд/район, село — нет</option>
+            <option>Знаю только губернию/область</option>
+            <option>Знаю только страну</option>
+            <option>Не знаю ничего о месте</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Что было в истории семьи</h3>
+      <p class="hint" style="margin-bottom:12px">Каждый пункт — это отдельный пласт документов. Отметьте всё, что слышали, даже как семейное предание.</p>
+      <div class="checks" data-checks="p.events">
+        <label class="check"><input type="checkbox" value="Переселение / миграция"><span>Переселение, переезд в другой регион</span></label>
+        <label class="check"><input type="checkbox" value="Репрессии, раскулачивание, ссылка"><span>Репрессии, раскулачивание, ссылка</span></label>
+        <label class="check"><input type="checkbox" value="Участие в ВОВ"><span>Участие в Великой Отечественной войне</span></label>
+        <label class="check"><input type="checkbox" value="Первая мировая / Гражданская"><span>Первая мировая, Гражданская война</span></label>
+        <label class="check"><input type="checkbox" value="Пропал без вести"><span>Кто-то пропал без вести</span></label>
+        <label class="check"><input type="checkbox" value="Смена фамилии / искажение"><span>Смена или искажение фамилии</span></label>
+        <label class="check"><input type="checkbox" value="Усыновление, детдом"><span>Усыновление, детдом, неизвестный отец</span></label>
+        <label class="check"><input type="checkbox" value="Дворянство / купечество / духовенство"><span>Дворянство, купечество, духовенство</span></label>
+        <label class="check"><input type="checkbox" value="Иная вера или национальность"><span>Иная вера или национальность (старообрядцы, немцы, евреи, поляки, мусульмане)</span></label>
+        <label class="check"><input type="checkbox" value="Эмиграция"><span>Эмиграция за границу</span></label>
+      </div>
+      <div style="margin-top:16px"><label class="f">Семейные предания и легенды — даже если звучат неправдоподобно</label>
+        <textarea data-b="p.legends" placeholder="Говорили, что прапрадед был из польских шляхтичей и его сослали..."></textarea></div>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section class="panel" data-step="4">
+    <h2 class="sec">Документы на руках</h2>
+    <p class="hint">Наличие хотя бы одного документа с точным местом рождения предка кардинально меняет и срок, и цену. Загружать сюда ничего не нужно — просто отметьте, что есть.</p>
+    <div class="card">
+      <div class="checks" data-checks="d.list">
+        <label class="check"><input type="checkbox" value="Свидетельства ЗАГС (рождение/брак/смерть)"><span>Свидетельства ЗАГС: рождение, брак, смерть</span></label>
+        <label class="check"><input type="checkbox" value="Паспорта / копии паспортов"><span>Паспорта или их копии</span></label>
+        <label class="check"><input type="checkbox" value="Военный билет, наградные документы"><span>Военный билет, наградные документы</span></label>
+        <label class="check"><input type="checkbox" value="Трудовая книжка, личное дело"><span>Трудовая книжка, личное дело</span></label>
+        <label class="check"><input type="checkbox" value="Справки о реабилитации"><span>Справки о реабилитации</span></label>
+        <label class="check"><input type="checkbox" value="Домовая книга, справки с места жительства"><span>Домовая книга, справки с места жительства</span></label>
+        <label class="check"><input type="checkbox" value="Старые фотографии с подписями"><span>Старые фотографии, особенно с подписями</span></label>
+        <label class="check"><input type="checkbox" value="Письма, дневники, записи"><span>Письма, дневники, семейные записи</span></label>
+        <label class="check"><input type="checkbox" value="Ответы архивов на прежние запросы"><span>Ответы архивов на прежние запросы</span></label>
+        <label class="check"><input type="checkbox" value="Ничего не сохранилось"><span>Ничего не сохранилось</span></label>
+      </div>
+      <div style="margin-top:16px"><label class="f">Самый дальний предок, о котором есть документ, и что это за документ</label>
+        <textarea data-b="d.deepest" placeholder="Свидетельство о рождении прадеда, 1911 г., с. Романово Курганского уезда"></textarea></div>
+      <div style="margin-top:16px"><label class="f">Живы ли старшие родственники, которых можно расспросить</label>
+        <div class="chips" data-chips="d.alive" data-single="1">
+          <div class="chip" data-v="Да, есть кого расспросить">Да, есть кого расспросить</div>
+          <div class="chip" data-v="Есть, но контакта нет">Есть, но контакта нет</div>
+          <div class="chip" data-v="Никого не осталось">Никого не осталось</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section class="panel" data-step="5">
+    <h2 class="sec">Результат и согласия</h2>
+    <p class="hint">Последний шаг — как вы хотите получить результат и что нам разрешено с ним делать.</p>
+    <div class="card">
+      <h3>В каком виде хотите получить результат</h3>
+      <div class="chips" data-chips="r.format">
+        <div class="chip" data-v="Электронный отчёт PDF">Электронный отчёт (PDF)</div>
+        <div class="chip" data-v="Печатный отчёт">Печатный отчёт</div>
+        <div class="chip" data-v="Родословное древо для печати">Древо большого формата для печати</div>
+        <div class="chip" data-v="Родословная книга">Родословная книга</div>
+        <div class="chip" data-v="Презентация-созвон">Созвон-презентация результатов</div>
+        <div class="chip" data-v="Сканы документов отдельно">Сканы документов отдельным архивом</div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Согласия</h3>
+      <div class="checks" data-checks="r.consents" style="grid-template-columns:1fr">
+        <label class="check"><input type="checkbox" value="Согласен на обработку персональных данных"><span>Даю согласие на обработку персональных данных в объёме, необходимом для оценки и проведения исследования (152-ФЗ).</span></label>
+        <label class="check"><input type="checkbox" value="Подтверждаю право передавать данные родственников"><span>Подтверждаю, что вправе передавать сведения о живущих родственниках, указанные в анкете.</span></label>
+        <label class="check"><input type="checkbox" value="Разрешаю обезличенную публикацию находок"><span>Разрешаю использовать обезличенные находки по моему роду в портфолио и публикациях бюро (без фамилии и данных живущих лиц). <i>Необязательно.</i></span></label>
+      </div>
+      <div style="margin-top:16px"><label class="f">Что ещё важно нам знать</label>
+        <textarea data-b="r.comment" placeholder="Любые уточнения, ограничения, пожелания"></textarea></div>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section class="panel" data-step="6">
+    <h2 class="sec">Предварительная оценка</h2>
+    <p class="hint">Считается по вашим ответам прямо здесь, в браузере. Это ориентир для разговора, а не коммерческое предложение: окончательные срок и стоимость исследователь называет после проверки сохранности фондов по вашему региону.</p>
+    <div id="verdict"></div>
+    <div class="card">
+      <h3>Заявка целиком</h3>
+      <pre class="sum" id="summary"></pre>
+      <div id="sendBox" style="display:none">
+        <label class="check" style="margin-bottom:12px"><input type="checkbox" id="okSend"><span>Подтверждаю согласие на обработку персональных данных и отправку заявки исследователю. <a href="#" id="privLink" style="color:var(--accent)">Как мы обращаемся с данными</a></span></label>
+        <div class="foot" style="margin-top:0">
+          <button class="btn accent" id="send" style="padding:11px 26px">Отправить заявку исследователю</button>
+          <span class="ui" id="sendMsg" style="font-size:13px;color:var(--muted);align-self:center"></span>
+        </div>
+        <input type="text" id="hp" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px" aria-hidden="true">
+        <hr style="border:none;border-top:1px solid var(--line);margin:20px 0 16px">
+      </div>
+      <div class="foot">
+        <button class="btn primary" id="dl">Скачать заявку (.txt)</button>
+        <button class="btn" id="copy">Скопировать текст</button>
+        <button class="btn" id="mail">Отправить на почту</button>
+        <button class="btn" id="prn">Печать / PDF</button>
+      </div>
+      <div class="foot">
+        <button class="btn ghost" id="save">Сохранить черновик (.json)</button>
+        <button class="btn ghost" id="loadBtn">Загрузить черновик</button>
+        <input type="file" id="loadFile" accept=".json" style="display:none">
+      </div>
+      <p class="disc">Анкета работает полностью в браузере: ничего никуда не отправляется автоматически. Чтобы не потерять данные, сохраните черновик файлом — его можно потом загрузить обратно и продолжить.</p>
+    </div>
+  </section>
+
+</div></main>
+
+<div class="navbar"><div class="wrap">
+  <button class="btn" id="prev">Назад</button>
+  <span class="pg ui" id="pg"></span>
+  <button class="btn primary" id="next">Далее</button>
+</div></div>
+
+<div class="mask" id="mask"><div class="modal">
+  <div class="mh"><div><b id="mTitle">Человек</b><span id="mPath"></span></div><button class="x" id="mX">&times;</button></div>
+  <div class="mb">
+    <div class="grid g2">
+      <div style="grid-column:1/-1"><label class="f">Фамилия, имя, отчество</label><input type="text" id="mName" placeholder="Чорня Артём Владимирович"></div>
+      <div><label class="f">Девичья фамилия (для женщин)</label><input type="text" id="mMaiden"></div>
+      <div><label class="f">Вероисповедание / национальность</label><input type="text" id="mFaith" placeholder="православные, украинцы"></div>
+      <div><label class="f">Год рождения</label><input type="text" id="mBirth" placeholder="1911 или ~1910-е"></div>
+      <div><label class="f">Год смерти</label><input type="text" id="mDeath" placeholder="1974"></div>
+      <div style="grid-column:1/-1"><label class="f">Место рождения — как можно подробнее</label><input type="text" id="mPlace" placeholder="с. Романово, Курганский уезд, Тобольская губ."></div>
+      <div style="grid-column:1/-1"><label class="f">Где жил и чем занимался</label><input type="text" id="mLife" placeholder="крестьянин, потом кузнец в Кургане"></div>
+      <div style="grid-column:1/-1"><label class="f">Чем подтверждается — документ, фото, только рассказы</label><input type="text" id="mProof" placeholder="свидетельство о рождении, копия есть"></div>
+      <div style="grid-column:1/-1"><label class="f">Что ещё известно</label><textarea id="mNotes" style="min-height:70px"></textarea></div>
+      <div style="grid-column:1/-1">
+        <label class="check"><input type="checkbox" id="mTarget"><span><b>Это ключевая линия</b> — именно её хочу исследовать в первую очередь</span></label>
+      </div>
+    </div>
+  </div>
+  <div class="mf">
+    <button class="btn ghost" id="mDel">Очистить</button>
+    <div style="display:flex;gap:10px"><button class="btn" id="mCancel">Отмена</button><button class="btn accent" id="mSave">Сохранить</button></div>
+  </div>
+</div></div>
+
+<div class="mask" id="privMask"><div class="modal">
+  <div class="mh"><div><b>Как мы обращаемся с вашими данными</b><span>кратко и по делу</span></div><button class="x" id="privX">&times;</button></div>
+  <div class="mb ui" style="font-size:13.5px;line-height:1.65;color:var(--ink-2)">
+    <p><b>Что собираем.</b> Только то, что вы сами вписали в анкету: контакты и сведения о предках, необходимые для оценки возможности поиска.</p>
+    <p><b>Зачем.</b> Чтобы оценить выполнимость, срок и стоимость исследования и связаться с вами по вашему запросу. Ни для чего другого.</p>
+    <p><b>Куда уходит.</b> Заявка отправляется напрямую исследователю в личный мессенджер. Промежуточных баз и рассылок нет: сама страница ничего не хранит.</p>
+    <p><b>Сведения о живущих родственниках.</b> Указывайте их только если вправе это делать. Если сомневаетесь — ограничьтесь умершими предками, для оценки этого достаточно.</p>
+    <p><b>Кому передаём.</b> Никому, кроме архивов и привлечённых исследователей — и только после заключения договора, в объёме, необходимом для поиска. Все привлечённые специалисты подписывают обязательство о конфиденциальности.</p>
+    <p><b>Сколько храним.</b> Если договор не заключён — заявка удаляется по вашему письменному требованию в любой момент. Если заключён — срок и порядок описаны в согласии на обработку персональных данных (приложение к договору).</p>
+    <p><b>Отзыв.</b> Напишите нам — удалим всё, что вы прислали.</p>
+    <p style="color:var(--muted);font-size:12.5px">Отправляя заявку, вы даёте согласие на обработку персональных данных в объёме, описанном выше, в соответствии с Федеральным законом № 152-ФЗ.</p>
+  </div>
+  <div class="mf" style="justify-content:flex-end"><button class="btn" id="privClose">Понятно</button></div>
+</div></div>
+
+<div class="toast" id="toast"></div>
+
+<!-- настройки отправки; если файла нет — анкета работает автономно -->
+<script src="config.js" onerror="void 0"></script>
+<script>
+/* =========================================================================
+   НАСТРОЙКИ ОТПРАВКИ
+   Заполняются в файле config.js рядом с index.html. Если его нет —
+   страница работает автономно: клиент скачивает заявку файлом.
+   ========================================================================= */
+const CFG = Object.assign({
+  mode: 'none',                       // 'telegram' | 'none'
+  telegram: { token: '', chatId: '' },
+  contactEmail: ''
+}, window.ANKETA_CONFIG || {});
+
+/* =========================================================================
+   ЦЕНОВЫЕ ОРИЕНТИРЫ — правьте здесь, если поменяется прайс.
+   Это подсказка клиенту, а не оферта; в тексте прямо об этом сказано.
+   ========================================================================= */
+const PRICE = {
+  point:  'от 5 000 до 20 000 ₽',
+  line:   'от 35 000 до 70 000 ₽ за линию',
+  multi:  'от 90 000 до 180 000 ₽',
+  book:   'от 150 000 ₽ + книга по отдельной смете'
+};
+
+/* --------------------------- состояние --------------------------- */
+const S = {
+  c:{name:'',city:'',phone:'',email:'',channel:'',source:''},
+  g:{type:[],question:'',deadline:'',budget:'',prior:[]},
+  t:{people:{}, gens:2, extra:''},
+  p:{places:'',countries:[],precision:'',events:[],legends:''},
+  d:{list:[],deepest:'',alive:''},
+  r:{format:[],consents:[],comment:''}
+};
+
+const STEPS = ['Контакты','Задача','Древо','География','Документы','Результат','Оценка'];
+let step = 0;
+
+/* --------------------------- утилиты --------------------------- */
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+function get(path){ return path.split('.').reduce((o,k)=>o?.[k], S); }
+function set(path,v){ const k=path.split('.'); const last=k.pop(); k.reduce((o,x)=>o[x],S)[last]=v; }
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('on'); setTimeout(()=>t.classList.remove('on'),1900); }
+
+/* --------------------------- шаги --------------------------- */
+function renderSteps(){
+  $('#steps').innerHTML = STEPS.map((s,i)=>
+    `<button data-i="${i}" class="${i===step?'active':''} ${filled(i)?'done':''}"><span class="dot"></span>${i+1}. ${s}</button>`).join('');
+  $$('#steps button').forEach(b=>b.onclick=()=>go(+b.dataset.i));
+  $('#pg').textContent = `Шаг ${step+1} из ${STEPS.length} — ${STEPS[step]}`;
+  $('#prev').disabled = step===0;
+  $('#next').textContent = step===STEPS.length-1 ? 'Готово' : 'Далее';
+  $('#next').disabled = step===STEPS.length-1;
+}
+function filled(i){
+  if(i===0) return !!(S.c.name||S.c.phone||S.c.email);
+  if(i===1) return S.g.type.length>0 || !!S.g.question;
+  if(i===2) return Object.keys(S.t.people).length>0;
+  if(i===3) return !!S.p.places || S.p.countries.length>0;
+  if(i===4) return S.d.list.length>0 || !!S.d.deepest;
+  if(i===5) return S.r.format.length>0 || S.r.consents.length>0;
+  return false;
+}
+function go(i){
+  step = Math.max(0, Math.min(STEPS.length-1, i));
+  $$('.panel').forEach(p=>p.classList.toggle('on', +p.dataset.step===step));
+  renderSteps();
+  if(step===2) setTimeout(drawTree,30);
+  if(step===6) renderResult();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+$('#next').onclick = ()=>go(step+1);
+$('#prev').onclick = ()=>go(step-1);
+
+/* --------------------------- биндинг полей --------------------------- */
+$$('[data-b]').forEach(el=>{
+  el.value = get(el.dataset.b) || '';
+  el.addEventListener('input', ()=>{ set(el.dataset.b, el.value); renderSteps(); });
+});
+$$('[data-chips]').forEach(box=>{
+  const path = box.dataset.chips, single = box.dataset.single==='1';
+  box.querySelectorAll('.chip').forEach(ch=>{
+    ch.onclick = ()=>{
+      const v = ch.dataset.v;
+      if(single){
+        const cur = get(path); const nv = cur===v ? '' : v;
+        set(path, nv);
+        box.querySelectorAll('.chip').forEach(x=>x.classList.toggle('on', x.dataset.v===nv));
+      } else {
+        const arr = get(path);
+        const i = arr.indexOf(v);
+        if(i>=0) arr.splice(i,1); else arr.push(v);
+        ch.classList.toggle('on', i<0);
+      }
+      renderSteps();
+    };
+  });
+});
+$$('[data-checks]').forEach(box=>{
+  const path = box.dataset.checks;
+  box.querySelectorAll('input[type=checkbox]').forEach(cb=>{
+    cb.onchange = ()=>{
+      const arr = get(path), v = cb.value, i = arr.indexOf(v);
+      if(cb.checked && i<0) arr.push(v);
+      if(!cb.checked && i>=0) arr.splice(i,1);
+      renderSteps();
+    };
+  });
+});
+
+/* --------------------------- древо --------------------------- */
+const ROW = 82, COLW = 246, CARDW = 196;
+function role(code){
+  const g = code.length;
+  if(g===0) return 'Вы';
+  const last = code[g-1];
+  const male = last==='F';
+  if(g===1) return male?'Отец':'Мать';
+  if(g===2) return male?'Дед':'Бабушка';
+  if(g===3) return male?'Прадед':'Прабабушка';
+  if(g===4) return male?'Прапрадед':'Прапрабабушка';
+  return male?'Предок':'Предок';
+}
+function chain(code){
+  if(code.length<2) return '';
+  return code.split('').map(c=>c==='F'?'отец':'мать').join(' → ') + ' — от вас вверх';
+}
+function codes(gen){
+  if(gen===0) return [''];
+  let out=[''];
+  for(let i=0;i<gen;i++) out = out.flatMap(c=>[c+'F', c+'M']);
+  return out;
+}
+function drawTree(){
+  const stage = $('#stage'), svg = $('#links');
+  const maxG = S.t.gens;
+  const totalRows = Math.pow(2, maxG);
+  const H = totalRows * ROW;
+  stage.style.width = ((maxG+1)*COLW - (COLW-CARDW) + 20) + 'px';
+  stage.style.height = H + 'px';
+  [...stage.querySelectorAll('.node')].forEach(n=>n.remove());
+  svg.setAttribute('width', stage.style.width);
+  svg.setAttribute('height', H);
+  svg.innerHTML = '';
+
+  const pos = {};
+  for(let g=0; g<=maxG; g++){
+    const cs = codes(g), slot = H / cs.length;
+    cs.forEach((code,i)=>{
+      const y = i*slot + slot/2;
+      const x = g*COLW;
+      pos[code] = {x,y};
+      const d = S.t.people[code];
+      const el = document.createElement('div');
+      el.className = 'node' + (d?'':' empty') + (g===0?' self':'') + (d&&d.target?' target':'') +
+                     (g>0 ? (code[g-1]==='F'?' f':' m') : '');
+      el.style.left = x+'px';
+      el.style.top = (y-31)+'px';
+      const nm = d && d.name ? d.name : '+ добавить';
+      const yrs = d ? [d.birth,d.death].filter(Boolean).join(' – ') : '';
+      const pl = d && d.place ? d.place : '';
+      el.innerHTML = `<div class="role">${role(code)}</div><div class="nm">${esc(nm)}</div>` +
+        (yrs||pl ? `<div class="meta">${esc([yrs,pl].filter(Boolean).join(' · '))}</div>`:'') +
+        (d&&d.target?`<div class="flag">КЛЮЧЕВАЯ ЛИНИЯ</div>`:'');
+      el.onclick = ()=>openPerson(code);
+      stage.appendChild(el);
+    });
+  }
+  // связи
+  let paths='';
+  for(let g=1; g<=maxG; g++){
+    codes(g).forEach(code=>{
+      const child = pos[code.slice(0,-1)], me = pos[code];
+      const x1 = child.x + CARDW, y1 = child.y;
+      const x2 = me.x, y2 = me.y;
+      const mx = x1 + (x2-x1)/2;
+      paths += `<path d="M${x1} ${y1} H${mx} V${y2} H${x2}" fill="none" stroke="#ddd5c7" stroke-width="1.5"/>`;
+    });
+  }
+  svg.innerHTML = paths;
+  const n = Object.keys(S.t.people).length;
+  const tgt = Object.values(S.t.people).filter(p=>p.target).length;
+  $('#treeStat').textContent = `Заполнено ${n} из ${Math.pow(2,maxG+1)-1} · ключевых линий: ${tgt}`;
+  $('#delGen').disabled = maxG<=1;
+  $('#addGen').disabled = maxG>=4;
+}
+function plur(n,a,b,c){const m=n%100,k=n%10;return (m>=11&&m<=14)?c:(k===1?a:(k>=2&&k<=4?b:c));}
+function esc(s){ return String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+$('#addGen').onclick = ()=>{ if(S.t.gens<4){S.t.gens++; drawTree();} };
+$('#delGen').onclick = ()=>{ if(S.t.gens>1){ codes(S.t.gens).forEach(c=>delete S.t.people[c]); S.t.gens--; drawTree(); } };
+
+let editing = null;
+function openPerson(code){
+  editing = code;
+  const d = S.t.people[code] || {};
+  $('#mTitle').textContent = role(code);
+  $('#mPath').textContent = chain(code);
+  ['Name','Maiden','Faith','Birth','Death','Place','Life','Proof','Notes'].forEach(k=>{
+    $('#m'+k).value = d[k.toLowerCase()] || '';
+  });
+  $('#mTarget').checked = !!d.target;
+  $('#mask').classList.add('on');
+  setTimeout(()=>$('#mName').focus(),50);
+}
+function closeModal(){ $('#mask').classList.remove('on'); editing=null; }
+$('#mX').onclick = $('#mCancel').onclick = closeModal;
+$('#mask').onclick = e => { if(e.target===$('#mask')) closeModal(); };
+$('#mSave').onclick = ()=>{
+  const d = {};
+  ['Name','Maiden','Faith','Birth','Death','Place','Life','Proof','Notes'].forEach(k=>{
+    const v = $('#m'+k).value.trim(); if(v) d[k.toLowerCase()] = v;
+  });
+  if($('#mTarget').checked) d.target = true;
+  if(Object.keys(d).length) S.t.people[editing] = d; else delete S.t.people[editing];
+  closeModal(); drawTree(); renderSteps();
+};
+$('#mDel').onclick = ()=>{ delete S.t.people[editing]; closeModal(); drawTree(); renderSteps(); };
+
+/* --------------------------- оценка --------------------------- */
+function assess(){
+  const P = S.t.people, keys = Object.keys(P);
+  const deepest = keys.length ? Math.max(...keys.map(k=>k.length)) : 0;
+  const hasDoc = S.d.list.some(x=>/ЗАГС|Военный|Паспорт|реабилитац|архив/i.test(x));
+  const nothing = S.d.list.includes('Ничего не сохранилось');
+  const prec = S.p.precision;
+  const ev = S.p.events;
+
+  let score = 0;
+  score += Math.min(deepest,4) * 12;                 // глубина известного
+  score += hasDoc ? 22 : 0;
+  score += nothing ? -14 : 0;
+  if(prec==='Знаю конкретное село или деревню') score += 26;
+  else if(prec==='Знаю уезд/район, село — нет') score += 14;
+  else if(prec==='Знаю только губернию/область') score += 4;
+  else if(prec==='Знаю только страну') score -= 8;
+  else if(prec==='Не знаю ничего о месте') score -= 18;
+  if(S.p.countries.includes('Россия')) score += 6;
+  if(S.p.countries.includes('Украина')) score -= 8;
+  if(S.p.countries.some(c=>['Молдова','Польша','Прибалтика','Кавказ','Не знаю'].includes(c))) score -= 6;
+  if(ev.includes('Усыновление, детдом')) score -= 12;
+  if(ev.includes('Пропал без вести')) score -= 8;
+  if(ev.includes('Смена фамилии / искажение')) score -= 8;
+  if(ev.includes('Эмиграция')) score -= 6;
+  if(ev.includes('Репрессии, раскулачивание, ссылка')) score += 4;   // архивы МВД/ФСБ дают материал
+  if(ev.includes('Дворянство / купечество / духовенство')) score += 8;
+  if(S.d.alive==='Да, есть кого расспросить') score += 6;
+
+  const zone = score >= 50 ? 'green' : (score >= 22 ? 'amber' : 'red');
+
+  const T = {
+    green: {
+      zone:'Зелёная зона', head:'Задача выглядит выполнимой в стандартные сроки',
+      text:'Известно место и есть документальная опора — это те два условия, при которых поиск обычно доходит до ревизских сказок и метрических книг XVIII–XIX веков. Скорее всего, работаем по обычной схеме: определяем приход, поднимаем метрики, идём вглубь по ревизиям.',
+      term:'4–6 месяцев'
+    },
+    amber: {
+      zone:'Жёлтая зона', head:'Работать можно, но начинаем с разведки',
+      text:'Часть исходных данных не подтверждена документами или география размыта. Разумно начать с точечной проверки: установить приход и найти опорную запись. Если она находится — дальше идёт обычное исследование, и это станет понятно за несколько недель, а не месяцев.',
+      term:'от 1 месяца на разведку, далее 4–6 месяцев'
+    },
+    red: {
+      zone:'Красная зона', head:'Поиск возможен, но с оговорками — это рискованный формат',
+      text:'Слишком мало отправных точек: место неизвестно или есть обстоятельства, разрывающие документальную цепочку. Такой поиск ведётся как рискованный: сначала недорогая проверка гипотез, и только при положительном результате — полноценное исследование. Отрицательный результат здесь реально возможен, и мы говорим об этом заранее.',
+      term:'сначала 3–6 недель разведки'
+    }
+  }[zone];
+
+  // ориентир по цене
+  const g = S.g.type;
+  let price = PRICE.line;
+  if(g.includes('Точечная проверка документа') && g.length===1) price = PRICE.point;
+  else if(g.includes('Родословная книга / оформление')) price = PRICE.book;
+  else if(g.includes('Восстановить род в глубину')) price = PRICE.multi;
+
+  // что уточнить
+  const todo = [];
+  if(!prec || prec==='Не знаю ничего о месте' || prec==='Знаю только страну')
+    todo.push('Определить населённый пункт и приход — без этого нельзя выйти на метрические книги.');
+  if(!hasDoc) todo.push('Найти хотя бы один документ с точной датой и местом рождения предка (свидетельство ЗАГС, военный билет, личное дело).');
+  if(deepest < 2) todo.push('Дозаполнить древо хотя бы до дедушек и бабушек — это отправная точка архивного поиска.');
+  if(ev.includes('Смена фамилии / искажение')) todo.push('Собрать все известные варианты написания фамилии — в документах они почти всегда разные.');
+  if(ev.includes('Усыновление, детдом')) todo.push('Уточнить, есть ли на руках документы об усыновлении: без них биологическая линия часто недоступна.');
+  if(S.p.countries.includes('Украина')) todo.push('Проверить сохранность и доступность фондов по украинским архивам — там доступ и оцифровка неравномерны.');
+  if(S.d.alive==='Да, есть кого расспросить') todo.push('Записать рассказы старших родственников до начала архивной работы — это часто экономит месяцы.');
+  if(!todo.length) todo.push('Проверить сохранность фондов по вашему региону и составить план исследования — это делается до подписания договора.');
+
+  return {level:zone, ...T, price, todo, score, deepest};
+}
+
+function renderResult(){
+  const a = assess();
+  $('#verdict').innerHTML = `
+    <div class="verdict ${a.level}">
+      <div class="zone">● ${a.zone}</div>
+      <h4>${a.head}</h4>
+      <p>${a.text}</p>
+      <div class="kv">
+        <div><div class="k">Ориентировочный срок</div><div class="v">${a.term}</div></div>
+        <div><div class="k">Порядок стоимости</div><div class="v" style="font-size:14px">${a.price}</div></div>
+        <div><div class="k">Глубина известного</div><div class="v">${a.deepest ? a.deepest+' '+plur(a.deepest,'поколение','поколения','поколений')+' назад' : 'не заполнено'}</div></div>
+      </div>
+      <ul class="notes">${a.todo.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>
+      <p class="disc">Оценка сформирована автоматически по вашим ответам и не является публичной офертой. Итоговые срок и стоимость определяются после проверки сохранности и доступности фондов по конкретному региону и фиксируются в договоре.</p>
+    </div>`;
+  $('#summary').textContent = summary();
+}
+
+/* --------------------------- сводка --------------------------- */
+function summary(){
+  const L=[]; const a=assess();
+  const line = (k,v)=>{ if(v&&String(v).trim()) L.push(k+': '+v); };
+  L.push('ЗАЯВКА НА ГЕНЕАЛОГИЧЕСКОЕ ИССЛЕДОВАНИЕ');
+  L.push('Родословное бюро Евгения Кравченко');
+  L.push(''.padEnd(58,'='));
+  L.push('');
+  L.push('1. КОНТАКТЫ');
+  line('   Имя', S.c.name); line('   Город', S.c.city); line('   Телефон', S.c.phone);
+  line('   Почта', S.c.email); line('   Удобный канал', S.c.channel); line('   Источник', S.c.source);
+  L.push('');
+  L.push('2. ЗАДАЧА');
+  line('   Формат', S.g.type.join('; '));
+  line('   Главный вопрос', S.g.question);
+  line('   Срок', S.g.deadline); line('   Бюджет', S.g.budget);
+  line('   Что делали раньше', S.g.prior.join('; '));
+  L.push('');
+  L.push('3. ДРЕВО');
+  const ks = Object.keys(S.t.people).sort((x,y)=>x.length-y.length||x.localeCompare(y));
+  if(!ks.length) L.push('   — не заполнено —');
+  ks.forEach(k=>{
+    const d = S.t.people[k];
+    const cn = chain(k);
+    L.push(`   ${role(k)}${cn?' ('+cn+')':''}${d.target?'  ★ КЛЮЧЕВАЯ ЛИНИЯ':''}`);
+    line('      ФИО', d.name); line('      Девичья', d.maiden);
+    line('      Годы', [d.birth,d.death].filter(Boolean).join(' – '));
+    line('      Место рождения', d.place); line('      Жизнь и занятие', d.life);
+    line('      Вера/национальность', d.faith);
+    line('      Подтверждение', d.proof); line('      Прочее', d.notes);
+  });
+  line('   Побочные ветви', S.t.extra);
+  L.push('');
+  L.push('4. ГЕОГРАФИЯ И ОБСТОЯТЕЛЬСТВА');
+  line('   Места', S.p.places); line('   Страны', S.p.countries.join(', '));
+  line('   Точность места', S.p.precision); line('   События', S.p.events.join('; '));
+  line('   Предания', S.p.legends);
+  L.push('');
+  L.push('5. ДОКУМЕНТЫ');
+  line('   На руках', S.d.list.join('; '));
+  line('   Самый дальний документ', S.d.deepest);
+  line('   Старшие родственники', S.d.alive);
+  L.push('');
+  L.push('6. РЕЗУЛЬТАТ И СОГЛАСИЯ');
+  line('   Форма результата', S.r.format.join('; '));
+  line('   Согласия', S.r.consents.join('; '));
+  line('   Комментарий', S.r.comment);
+  L.push('');
+  L.push(''.padEnd(58,'-'));
+  L.push('ПРЕДВАРИТЕЛЬНАЯ ОЦЕНКА (автоматическая, не оферта)');
+  L.push('   Зона: ' + a.zone + ' — ' + a.head);
+  L.push('   Срок: ' + a.term);
+  L.push('   Порядок стоимости: ' + a.price);
+  L.push('   Что уточнить в первую очередь:');
+  a.todo.forEach(t=>L.push('     • ' + t));
+  return L.join('\n');
+}
+
+/* --------------------------- экспорт --------------------------- */
+function download(name, text, type){
+  const b = new Blob([text], {type: type||'text/plain;charset=utf-8'});
+  const u = URL.createObjectURL(b);
+  const a = document.createElement('a');
+  a.href = u; a.download = name; a.click();
+  setTimeout(()=>URL.revokeObjectURL(u), 1500);
+}
+$('#dl').onclick = ()=>{
+  const who = (S.c.name||'заявка').replace(/[^\wа-яА-ЯёЁ\- ]/g,'').trim() || 'заявка';
+  download(`Заявка — ${who}.txt`, summary());
+  toast('Файл скачан');
+};
+$('#copy').onclick = async ()=>{
+  try{ await navigator.clipboard.writeText(summary()); toast('Текст скопирован'); }
+  catch(e){ toast('Не удалось скопировать — скачайте файл'); }
+};
+$('#mail').onclick = ()=>{
+  const s = encodeURIComponent('Заявка на генеалогическое исследование — ' + (S.c.name||''));
+  const b = encodeURIComponent(summary().slice(0, 1800) + '\n\n[полная версия — во вложении, скачайте файл кнопкой «Скачать заявку»]');
+  location.href = `mailto:kreugv00@yandex.ru?subject=${s}&body=${b}`;
+};
+$('#prn').onclick = ()=>window.print();
+$('#save').onclick = ()=>{ download('черновик-анкеты.json', JSON.stringify(S,null,2), 'application/json'); toast('Черновик сохранён'); };
+$('#loadBtn').onclick = ()=>$('#loadFile').click();
+$('#loadFile').onchange = e=>{
+  const f = e.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = ()=>{
+    try{
+      const o = JSON.parse(r.result);
+      Object.keys(S).forEach(k=>{ if(o[k]) S[k] = o[k]; });
+      hydrate(); toast('Черновик загружен');
+    }catch(err){ toast('Не удалось прочитать файл'); }
+  };
+  r.readAsText(f);
+};
+function hydrate(){
+  $$('[data-b]').forEach(el=>{ el.value = get(el.dataset.b) || ''; });
+  $$('[data-chips]').forEach(box=>{
+    const v = get(box.dataset.chips);
+    box.querySelectorAll('.chip').forEach(ch=>{
+      ch.classList.toggle('on', Array.isArray(v) ? v.includes(ch.dataset.v) : v===ch.dataset.v);
+    });
+  });
+  $$('[data-checks]').forEach(box=>{
+    const v = get(box.dataset.checks) || [];
+    box.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.checked = v.includes(cb.value));
+  });
+  drawTree(); renderSteps(); if(step===6) renderResult();
+}
+
+/* --------------------------- отправка --------------------------- */
+function who(){ return (S.c.name||'без имени').replace(/[^\wа-яА-ЯёЁ\- ]/g,'').trim() || 'без имени'; }
+function headline(){
+  const a = assess();
+  const zoneIcon = a.level==='green' ? '🟢' : a.level==='amber' ? '🟡' : '🔴';
+  const tgt = Object.entries(S.t.people).find(([,v])=>v.target);
+  const L = ['🗂 НОВАЯ ЗАЯВКА С САЙТА', ''];
+  L.push('👤 ' + (S.c.name || '—') + (S.c.city ? ', ' + S.c.city : ''));
+  if(S.c.phone) L.push('📞 ' + S.c.phone);
+  if(S.c.email) L.push('✉️ ' + S.c.email);
+  if(S.c.channel) L.push('💬 удобно: ' + S.c.channel);
+  L.push('');
+  if(S.g.type.length) L.push('🎯 ' + S.g.type.join(', '));
+  if(S.g.question) L.push('❓ ' + S.g.question.slice(0,300));
+  if(S.p.places) L.push('📍 ' + S.p.places.slice(0,200));
+  if(tgt) L.push('★ ключевая линия: ' + (tgt[1].name || role(tgt[0])));
+  if(S.g.budget) L.push('💰 ' + S.g.budget);
+  L.push('');
+  L.push(zoneIcon + ' ' + a.zone + ' · ' + a.term);
+  L.push('Порядок стоимости: ' + a.price);
+  return L.join('\n').slice(0, 3900);
+}
+async function sendTelegram(){
+  const {token, chatId} = CFG.telegram;
+  if(!token || !chatId) throw new Error('нет настроек');
+  const r1 = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ chat_id: chatId, text: headline(), disable_web_page_preview:true })
+  });
+  if(!r1.ok) throw new Error('telegram ' + r1.status);
+  const fd = new FormData();
+  fd.append('chat_id', chatId);
+  fd.append('caption', 'Полная анкета — ' + who());
+  fd.append('document', new Blob([summary()], {type:'text/plain;charset=utf-8'}), `Заявка — ${who()}.txt`);
+  const r2 = await fetch(`https://api.telegram.org/bot${token}/sendDocument`, { method:'POST', body: fd });
+  if(!r2.ok) throw new Error('telegram doc ' + r2.status);
+}
+let sent = false;
+async function submit(){
+  if(sent) return;
+  if($('#hp').value) return;                       // ловушка для ботов
+  if(!$('#okSend').checked){ toast('Нужно подтвердить согласие'); return; }
+  if(!S.c.name || !(S.c.phone || S.c.email)){ toast('Впишите имя и телефон или почту — шаг 1'); go(0); return; }
+  const b = $('#send'), m = $('#sendMsg');
+  b.disabled = true; m.textContent = 'Отправляем…';
+  try{
+    await sendTelegram();
+    sent = true;
+    b.textContent = 'Заявка отправлена';
+    m.innerHTML = '<span style="color:var(--green)">Готово. Исследователь ответит в ближайшее время — обычно в течение суток.</span>';
+    toast('Заявка отправлена');
+  }catch(e){
+    b.disabled = false;
+    m.innerHTML = '<span style="color:var(--accent)">Не удалось отправить. Скачайте заявку файлом и пришлите её нам — кнопки ниже.</span>';
+  }
+}
+$('#send') && ($('#send').onclick = submit);
+$('#privLink') && ($('#privLink').onclick = e=>{ e.preventDefault(); $('#privMask').classList.add('on'); });
+$('#privX').onclick = $('#privClose').onclick = ()=>$('#privMask').classList.remove('on');
+$('#privMask').onclick = e=>{ if(e.target===$('#privMask')) $('#privMask').classList.remove('on'); };
+if(CFG.mode === 'telegram' && CFG.telegram.token && CFG.telegram.chatId) $('#sendBox').style.display = 'block';
+
+/* --------------------------- старт --------------------------- */
+renderSteps(); drawTree();
+window.addEventListener('resize', ()=>{ if(step===2) drawTree(); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && $('#mask').classList.contains('on')) closeModal(); });
+</script>
+</body>
+</html>
