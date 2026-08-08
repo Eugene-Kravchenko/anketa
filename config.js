@@ -9,9 +9,9 @@ window.ANKETA_CONFIG = {
 
   telegram: {
     // токен от @BotFather, вида 1234567890:AAH...
-    token:  'ВСТАВЬ_ТОКЕН_БОТА',
+    token:  '8892455525:AAGR1hRD1-tSOpyMl7ps9vkWdKeui3I-ejY',
     // твой chat_id — числом, вида 123456789
-    chatId: 'ВСТАВЬ_CHAT_ID'
+    chatId: '862858837'
   },
 
   // почта для связи, показывается клиенту (необязательно)
