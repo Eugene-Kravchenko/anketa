@@ -1010,21 +1010,44 @@ function headline(){
   L.push('Порядок стоимости: ' + a.price);
   return L.join('\n').slice(0, 3900);
 }
+async function tgCall(method, init){
+  const r = await fetch(`https://api.telegram.org/bot${CFG.telegram.token}/${method}`, init);
+  let j = null;
+  try { j = await r.json(); } catch(e){}
+  if(!r.ok || !j || j.ok !== true){
+    const d = (j && j.description) || ('HTTP ' + r.status);
+    const err = new Error(d);
+    err.code = j && j.error_code;
+    throw err;
+  }
+  return j;
+}
 async function sendTelegram(){
   const {token, chatId} = CFG.telegram;
-  if(!token || !chatId) throw new Error('нет настроек');
-  const r1 = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+  if(!token || !chatId) throw new Error('в config.js не заданы token или chatId');
+  await tgCall('sendMessage', {
     method:'POST', headers:{'Content-Type':'application/json'},
     body: JSON.stringify({ chat_id: chatId, text: headline(), disable_web_page_preview:true })
   });
-  if(!r1.ok) throw new Error('telegram ' + r1.status);
   const fd = new FormData();
   fd.append('chat_id', chatId);
   fd.append('caption', 'Полная анкета — ' + who());
   fd.append('document', new Blob([summary()], {type:'text/plain;charset=utf-8'}), `Заявка — ${who()}.txt`);
-  const r2 = await fetch(`https://api.telegram.org/bot${token}/sendDocument`, { method:'POST', body: fd });
-  if(!r2.ok) throw new Error('telegram doc ' + r2.status);
+  await tgCall('sendDocument', { method:'POST', body: fd });
 }
+function diagHint(msg){
+  const m = String(msg).toLowerCase();
+  if(m.includes("can't initiate") || m.includes('chat not found') || m.includes('blocked'))
+    return 'Бот не может написать первым. Откройте своего бота в Telegram и нажмите «Начать» (/start), затем повторите отправку.';
+  if(m.includes('unauthorized'))
+    return 'Токен бота неверен или отозван. Проверьте token в config.js.';
+  if(m.includes('chat_id') || m.includes('chat id'))
+    return 'Неверный chatId. Узнайте свой Id у @userinfobot и впишите его числом в config.js.';
+  if(m.includes('failed to fetch'))
+    return 'Браузер не смог достучаться до api.telegram.org — возможно, блокировка провайдера, VPN или расширение.';
+  return msg;
+}
+
 let sent = false;
 async function submit(){
   if(sent) return;
@@ -1041,7 +1064,12 @@ async function submit(){
     toast('Заявка отправлена');
   }catch(e){
     b.disabled = false;
-    m.innerHTML = '<span style="color:var(--accent)">Не удалось отправить. Скачайте заявку файлом и пришлите её нам — кнопки ниже.</span>';
+    console.error('[анкета] отправка не удалась:', e);
+    window.ankDiag = String(e && e.message || e);
+    const debug = /[?&]debug/.test(location.search);
+    m.innerHTML = '<span style="color:var(--accent)">Не удалось отправить. Скачайте заявку файлом и пришлите её нам — кнопки ниже.</span>' +
+      (debug ? '<br><span style="color:var(--ink-2);font-size:12px">Диагностика: ' + esc(String(e && e.message || e)) +
+               '<br>' + esc(diagHint(e && e.message || e)) + '</span>' : '');
   }
 }
 $('#send') && ($('#send').onclick = submit);
