@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Реестр заявок — Родословное бюро «Исток»</title>
+<style>
+:root{
+  --paper:#f1ede4;
+  --paper-2:#fbf9f4;
+  --ink:#232019;
+  --ink-2:#4f4a40;
+  --ink-3:#8b8375;
+  --rule:#c9c0ae;
+  --rule-2:#e0d9c9;
+  --accent:#7c2b25;
+  --accent-3:#f0e7e3;
+  --blue:#3d5266;
+  --rose:#8a5560;
+  --green:#3d6647;
+  --amber:#8a6320;
+  --serif:Georgia,"PT Serif",Cambria,"Times New Roman",serif;
+  --sans:"Helvetica Neue",Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--serif);background:var(--paper);color:var(--ink);font-size:16px;
+  -webkit-font-smoothing:antialiased;font-variant-numeric:oldstyle-nums;
+}
+.ui{font-family:var(--sans)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 32px}
+@media(max-width:640px){.wrap{padding:0 16px}}
+
+/* ------------------------------------------------------------ шапка */
+header.top{background:var(--paper-2);border-bottom:1px solid var(--rule);padding:22px 0 0}
+.masthead{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;
+  padding-bottom:14px;border-bottom:3px double var(--rule)}
+.bureau{font-family:var(--sans);font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--accent);font-weight:600;margin-bottom:6px}
+.masthead h1{font-size:25px;font-weight:400;margin:0;line-height:1.15}
+.formno{text-align:right;font-family:var(--sans);font-size:10.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-3);line-height:1.8;white-space:nowrap}
+.formno span{display:block}
+@media(max-width:700px){.masthead{display:block}.formno{display:none}}
+
+/* ------------------------------------------------------------ панель управления */
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:14px 0 16px}
+button,.btn{
+  font-family:var(--sans);font-size:12px;letter-spacing:.06em;padding:9px 15px;
+  border:1px solid var(--rule);background:var(--paper-2);color:var(--ink);cursor:pointer;
+  border-radius:0;transition:.12s;
+}
+button:hover,.btn:hover{border-color:var(--ink);background:#fff}
+button.pri{background:var(--ink);color:var(--paper-2);border-color:var(--ink)}
+button.pri:hover{background:var(--accent);border-color:var(--accent)}
+button.danger:hover{border-color:var(--accent);color:var(--accent)}
+button:disabled{opacity:.45;cursor:default}
+input[type=search],select{
+  font-family:var(--sans);font-size:13px;padding:9px 11px;border:1px solid var(--rule);
+  background:var(--paper-2);color:var(--ink);border-radius:0;
+}
+input[type=search]{min-width:220px;flex:1}
+input[type=search]:focus,select:focus{outline:0;border-color:var(--ink)}
+.spacer{flex:1}
+
+/* ------------------------------------------------------------ зона загрузки */
+.drop{
+  border:1px dashed var(--rule);background:rgba(251,249,244,.55);padding:26px 22px;
+  text-align:center;font-family:var(--sans);font-size:13px;color:var(--ink-3);line-height:1.6;
+  margin-bottom:22px;cursor:pointer;transition:.12s;
+}
+.drop:hover{border-color:var(--ink-3);color:var(--ink-2)}
+.drop.hot{border-color:var(--accent);border-style:solid;background:var(--accent-3);color:var(--accent)}
+.drop b{font-weight:600;color:var(--ink-2)}
+
+/* ------------------------------------------------------------ сводка */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:1px;
+  background:var(--rule-2);border:1px solid var(--rule-2);margin-bottom:22px}
+.stat{background:var(--paper-2);padding:14px 16px}
+.stat .k{font-family:var(--sans);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink-3);font-weight:600;margin-bottom:7px}
+.stat .v{font-size:27px;line-height:1;font-variant-numeric:tabular-nums}
+.stat .v small{font-size:13px;color:var(--ink-3)}
+.stat.z .v{display:flex;gap:14px;align-items:baseline;font-size:22px}
+.zn{display:inline-flex;align-items:baseline;gap:5px}
+.zn i{width:9px;height:9px;border-radius:50%;display:inline-block;font-style:normal}
+.zn.g i{background:var(--green)} .zn.a i{background:var(--amber)} .zn.r i{background:var(--accent)}
+
+.charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px;margin-bottom:26px}
+.card{background:var(--paper-2);border:1px solid var(--rule-2);padding:16px 18px 18px}
+.card h3{font-family:var(--sans);font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--ink-3);font-weight:600;margin:0 0 14px;padding-bottom:9px;border-bottom:1px solid var(--rule-2)}
+.brow{display:grid;grid-template-columns:1fr 46px;gap:10px 10px;align-items:center;margin-bottom:11px;
+  font-family:var(--sans);font-size:12.5px}
+.brow .lbl{color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.brow .track{grid-column:1/-1;height:5px;background:var(--rule-2);margin-top:-6px}
+.brow .fill{height:5px}
+.brow .num{text-align:right;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.empty-note{font-family:var(--sans);font-size:12.5px;color:var(--ink-3);font-style:italic}
+
+/* ------------------------------------------------------------ список заявок */
+.list{border-top:1px solid var(--rule)}
+.row{
+  display:grid;grid-template-columns:1fr 180px 168px 120px 30px;gap:18px;align-items:center;
+  padding:15px 4px;border-bottom:1px solid var(--rule-2);cursor:pointer;transition:.1s;
+}
+.row:hover{background:var(--paper-2)}
+.row .who{font-size:17px;line-height:1.25}
+.row .sub{font-family:var(--sans);font-size:11.5px;color:var(--ink-3);margin-top:4px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .cell{font-family:var(--sans);font-size:12px;color:var(--ink-2);line-height:1.45}
+.row .cell .cap{display:block;font-size:9px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-3);margin-bottom:3px}
+.row .arr{text-align:right;color:var(--rule);font-size:18px}
+.row:hover .arr{color:var(--accent)}
+@media(max-width:900px){
+  .row{grid-template-columns:1fr auto;gap:10px}
+  .row .cell.hidem{display:none}
+  .row .arr{display:none}
+}
+.badge{
+  display:inline-block;font-family:var(--sans);font-size:9.5px;font-weight:600;letter-spacing:.14em;
+  text-transform:uppercase;padding:4px 9px;border:1px solid;white-space:nowrap
+}
+.badge.green{color:var(--green);border-color:rgba(61,102,71,.45);background:rgba(61,102,71,.07)}
+.badge.amber{color:var(--amber);border-color:rgba(138,99,32,.45);background:rgba(138,99,32,.07)}
+.badge.red{color:var(--accent);border-color:rgba(124,43,37,.4);background:var(--accent-3)}
+.badge.grey{color:var(--ink-3);border-color:var(--rule-2)}
+
+/* ------------------------------------------------------------ карточка заявки */
+.detail{display:none}
+.detail.on{display:block}
+.list-view.off{display:none}
+.dhead{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;
+  padding:14px 0 16px;border-bottom:3px double var(--rule);margin-bottom:24px}
+.dhead h2{margin:0 0 8px;font-size:29px;font-weight:400;line-height:1.15}
+.dhead .meta{font-family:var(--sans);font-size:12.5px;color:var(--ink-3);line-height:1.7}
+.dhead .meta a{color:var(--ink-2);text-decoration:none;border-bottom:1px solid var(--rule)}
+.dhead .meta a:hover{color:var(--accent);border-color:var(--accent)}
+@media(max-width:640px){.dhead{display:block}.dhead>div:last-child{text-align:left!important;margin-top:14px}}
+
+.sect{margin-bottom:28px}
+.sect > h3{
+  font-family:var(--sans);font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--accent);font-weight:600;margin:0 0 14px;padding-bottom:8px;border-bottom:1px solid var(--rule-2)
+}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px 26px}
+.kv .k{font-family:var(--sans);font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--ink-3);font-weight:600;margin-bottom:5px}
+.kv .v{font-size:15px;line-height:1.5;white-space:pre-wrap}
+.tags{display:flex;flex-wrap:wrap;gap:7px}
+.tag{font-family:var(--sans);font-size:11.5px;padding:5px 10px;background:var(--paper-2);
+  border:1px solid var(--rule-2);color:var(--ink-2)}
+.tag.warn{border-color:rgba(124,43,37,.35);color:var(--accent);background:var(--accent-3)}
+
+.verdict{border:1px solid var(--rule);background:var(--paper-2);padding:18px 20px}
+.verdict.green{border-left:4px solid var(--green)}
+.verdict.amber{border-left:4px solid var(--amber)}
+.verdict.red{border-left:4px solid var(--accent)}
+.verdict.grey{border-left:4px solid var(--rule)}
+.verdict h4{margin:6px 0 8px;font-size:19px;font-weight:400}
+.verdict .zone{font-family:var(--sans);font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  font-weight:600;color:var(--ink-3)}
+.verdict ul{margin:14px 0 0;padding-left:18px;font-size:14.5px;line-height:1.6;color:var(--ink-2)}
+.verdict .pair{display:flex;flex-wrap:wrap;gap:26px;margin-top:12px;padding-top:12px;border-top:1px solid var(--rule-2)}
+.verdict .pk{font-family:var(--sans);font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--ink-3);font-weight:600;margin-bottom:4px}
+
+/* ------------------------------------------------------------ древо */
+.treebox{border:1px solid var(--rule-2);background:var(--paper-2);overflow:auto;padding:16px}
+.stage{position:relative}
+.stage svg{position:absolute;left:0;top:0;pointer-events:none}
+.node{
+  position:absolute;width:186px;background:var(--paper-2);border:1px solid var(--rule);
+  padding:7px 10px 9px;font-family:var(--sans);
+}
+.node .role{font-size:9px;text-transform:uppercase;letter-spacing:.16em;color:var(--ink-3);
+  padding-bottom:4px;margin-bottom:5px;border-bottom:1px solid var(--rule-2);font-weight:600}
+.node .nm{font-family:var(--serif);font-size:13.5px;line-height:1.28}
+.node .meta{font-size:10.5px;color:var(--ink-3);margin-top:3px;line-height:1.35}
+.node.empty{border-style:dashed;border-color:var(--rule-2);background:transparent}
+.node.empty .nm{color:var(--ink-3);font-style:italic;font-size:12.5px}
+.node.self{border-color:var(--ink)}
+.node.target{border-color:var(--accent);background:var(--accent-3)}
+.node .flag{display:block;font-size:8.5px;color:var(--accent);font-weight:700;letter-spacing:.15em;margin-top:5px}
+.node.f::before,.node.m::before{content:'';position:absolute;left:-1px;top:-1px;bottom:-1px;width:3px}
+.node.f::before{background:var(--blue)}
+.node.m::before{background:var(--rose)}
+
+pre.raw{font-family:var(--mono);font-size:12px;line-height:1.55;white-space:pre-wrap;
+  background:var(--paper-2);border:1px solid var(--rule-2);padding:16px;color:var(--ink-2);
+  max-height:420px;overflow:auto}
+
+/* ------------------------------------------------------------ прочее */
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(14px);
+  background:var(--ink);color:var(--paper-2);font-family:var(--sans);font-size:13px;
+  padding:11px 20px;opacity:0;pointer-events:none;transition:.2s;z-index:60}
+.toast.on{opacity:1;transform:translateX(-50%)}
+footer.foot{border-top:1px solid var(--rule);margin-top:44px;padding:18px 0 40px;
+  font-family:var(--sans);font-size:11.5px;color:var(--ink-3);line-height:1.7}
+.hidden{display:none!important}
+@media print{
+  .bar,.drop,.stats,.charts,.list-view,footer.foot,.noprint{display:none!important}
+  body{background:#fff}
+  .treebox{overflow:visible;border:0}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="masthead">
+      <div>
+        <div class="bureau">Родословное бюро «Исток»</div>
+        <h1>Реестр заявок с анкеты</h1>
+      </div>
+      <div class="formno ui">
+        <span>Внутренний документ</span>
+        <span>Данные хранятся в этом браузере</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ===================== СПИСОК ===================== -->
+  <div class="list-view" id="listView">
+
+    <div class="bar">
+      <button class="pri" id="addBtn">Загрузить заявки</button>
+      <button id="pasteBtn">Вставить текстом</button>
+      <input type="search" id="q" placeholder="Поиск: имя, город, фамилия, место…">
+      <select id="fz">
+        <option value="">Все зоны</option>
+        <option value="green">Зелёная</option>
+        <option value="amber">Жёлтая</option>
+        <option value="red">Красная</option>
+      </select>
+      <select id="sort">
+        <option value="new">Сначала новые</option>
+        <option value="old">Сначала старые</option>
+        <option value="name">По имени</option>
+        <option value="zone">По зоне</option>
+      </select>
+      <span class="spacer"></span>
+      <button id="expJson">Выгрузить JSON</button>
+      <button id="expCsv">Выгрузить CSV</button>
+      <button class="danger" id="clr">Очистить</button>
+    </div>
+
+    <div class="drop" id="drop">
+      Перетащите сюда файлы <b>«Заявка — Имя.txt»</b> из Telegram — можно сразу несколько.<br>
+      Принимаются также черновики <b>черновик-анкеты.json</b> и прошлая выгрузка <b>реестр-заявок.json</b>.
+      Ничего никуда не отправляется: разбор идёт в браузере, заявки лежат в его памяти на этом компьютере.
+    </div>
+
+    <div class="stats" id="stats"></div>
+    <div class="charts" id="charts"></div>
+
+    <div class="bar" style="padding:0 0 8px">
+      <div class="ui" style="font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-3);font-weight:600" id="cnt"></div>
+    </div>
+    <div class="list" id="list"></div>
+  </div>
+
+  <!-- ===================== КАРТОЧКА ===================== -->
+  <div class="detail" id="detailView"></div>
+
+</div>
+
+<footer class="foot">
+  <div class="wrap">
+    Реестр работает без сервера: заявки разбираются и хранятся локально (localStorage этого браузера).
+    Чтобы перенести их на другой компьютер — «Выгрузить JSON», затем перетащить этот файл сюда же.
+  </div>
+</footer>
+
+<input type="file" id="file" multiple accept=".txt,.json,text/plain,application/json" class="hidden">
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================================
+   РЕЕСТР ЗАЯВОК — читает файлы, которые формирует анкета (index.html).
+   Формат .txt задан функцией summary() в index.html; парсер ниже держится
+   за него. Меняете summary() — проверьте парсер parseTxt().
+   ========================================================================= */
+const $  = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const KEY = 'istok_anketa_registry_v1';
+
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('on'); setTimeout(()=>t.classList.remove('on'),2200); }
+function plur(n,a,b,c){ n=Math.abs(n)%100; const n1=n%10; if(n>10&&n<20) return c; if(n1>1&&n1<5) return b; if(n1===1) return a; return c; }
+
+/* --------------------------- хранилище --------------------------- */
+let DB = load();
+function load(){
+  try{ const v = JSON.parse(localStorage.getItem(KEY)); return Array.isArray(v) ? v : []; }
+  catch(e){ return []; }
+}
+function save(){
+  try{ localStorage.setItem(KEY, JSON.stringify(DB)); }
+  catch(e){ toast('Память браузера переполнена — выгрузите JSON'); }
+}
+
+/* =========================================================================
+   ПАРСЕР .txt
+   ========================================================================= */
+const SECN = {'1':'c','2':'g','3':'t','4':'p','5':'d','6':'r'};
+const FIELD = /^(\s{2,})([A-Za-zА-ЯЁа-яё\/ .]{2,34}):\s?(.*)$/;
+
+function roleToCode(roleLine){
+  // "Вы" | "Отец" | "Дед (отец → отец — от вас вверх)"
+  const mm = roleLine.match(/\(([^)]*)\)/);
+  if(mm){
+    const path = mm[1].split('—')[0].trim();               // "отец → отец"
+    const parts = path.split('→').map(s=>s.trim());
+    if(parts.length && parts.every(p=>p==='отец'||p==='мать'))
+      return parts.map(p=>p==='отец'?'F':'M').join('');
+  }
+  const head = roleLine.replace(/\(.*/,'').trim().toLowerCase();
+  if(head === 'вы') return '';
+  if(head === 'отец') return 'F';
+  if(head === 'мать') return 'M';
+  return null;
+}
+
+const PMAP = {'ФИО':'name','Девичья':'maiden','Годы':'years','Место рождения':'place',
+              'Жизнь и занятие':'life','Вера/национальность':'faith',
+              'Подтверждение':'proof','Прочее':'notes'};
+
+function parseTxt(text){
+  const lines = text.replace(/\r/g,'').split('\n');
+  const R = {
+    c:{}, g:{}, p:{}, d:{}, r:{},
+    people:{}, extra:'',
+    a:{zone:'',head:'',term:'',price:'',todo:[]},
+    raw:text
+  };
+  let sec=null, person=null, ref=null, footer=false;
+
+  for(const ln of lines){
+    const t = ln.trim();
+    if(!t){ ref=null; continue; }                          // пустая строка обрывает продолжение
+    if(/^={6,}$/.test(t)) continue;
+    if(/^-{6,}$/.test(t)){ footer=true; person=null; ref=null; continue; }
+
+    const ms = ln.match(/^(\d)\.\s+([А-ЯЁ].*)$/);
+    if(!footer && ms && SECN[ms[1]]){ sec=SECN[ms[1]]; person=null; ref=null; continue; }
+
+    /* ---------- подвал: предварительная оценка ---------- */
+    if(footer){
+      if(t.startsWith('•')){ R.a.todo.push(t.replace(/^•\s*/,'')); continue; }
+      const mf = ln.match(FIELD);
+      if(!mf) continue;                                    // заголовок «ПРЕДВАРИТЕЛЬНАЯ ОЦЕНКА…»
+      const k = mf[2].trim(), v = mf[3].trim();
+      if(k==='Зона'){
+        const parts = v.split('—');
+        R.a.zone = (parts[0]||'').trim();
+        R.a.head = parts.slice(1).join('—').trim();
+      }
+      else if(k==='Срок') R.a.term = v;
+      else if(k==='Порядок стоимости') R.a.price = v;
+      continue;
+    }
+
+    /* ---------- древо ---------- */
+    if(sec==='t'){
+      const mf = ln.match(FIELD);
+      if(mf && /^\s{5,}\S/.test(ln) && person!==null){      // поле человека — отступ 6
+        const k = mf[2].trim(), v = mf[3].trim();
+        const p = R.people[person], key = PMAP[k] || k;
+        p[key] = p[key] ? p[key] + '\n' + v : v;
+        ref = {o:p, k:key};
+        continue;
+      }
+      if(mf && /^\s{2,4}\S/.test(ln)){                      // «Побочные ветви: …»
+        R.extra = mf[3].trim(); ref = {o:R, k:'extra'}; person=null; continue;
+      }
+      if(/^\s{2,4}\S/.test(ln)){                            // строка роли
+        if(/не заполнено/.test(t)){ person=null; ref=null; continue; }
+        const star = /★/.test(t);
+        const code = roleToCode(t.replace(/★.*$/,'').replace(/\s+$/,''));
+        if(code!==null){
+          person = code;
+          R.people[code] = R.people[code] || {};
+          if(star) R.people[code].target = true;
+          ref = null;
+        }
+        continue;
+      }
+      if(ref) ref.o[ref.k] += '\n' + t;                     // продолжение многострочного
+      continue;
+    }
+
+    /* ---------- обычные секции ---------- */
+    if(sec){
+      const mf = ln.match(FIELD);
+      if(mf){
+        const k = mf[2].trim(), v = mf[3].trim();
+        R[sec][k] = R[sec][k] ? R[sec][k] + '\n' + v : v;
+        ref = {o:R[sec], k};
+        continue;
+      }
+      if(ref) ref.o[ref.k] += '\n' + t;                     // продолжение (места, предания)
+    }
+  }
+  return R;
+}
+
+/* --------------------------- черновик .json --------------------------- */
+function fromDraft(o){
+  const R = {c:{},g:{},p:{},d:{},r:{},people:{},extra:'',a:{zone:'',head:'',term:'',price:'',todo:[]},raw:''};
+  const put=(sec,k,v)=>{ const s = Array.isArray(v)?v.join('; '):(v==null?'':String(v)); if(s.trim()) R[sec][k]=s; };
+  const c=o.c||{}, g=o.g||{}, p=o.p||{}, d=o.d||{}, r=o.r||{}, t=o.t||{};
+  put('c','Имя',c.name); put('c','Город',c.city); put('c','Телефон',c.phone);
+  put('c','Почта',c.email); put('c','Удобный канал',c.channel); put('c','Источник',c.source);
+  put('g','Формат',g.type); put('g','Главный вопрос',g.question);
+  put('g','Срок',g.deadline); put('g','Что делали раньше',g.prior);
+  put('p','Места',p.places); put('p','Страны',p.countries);
+  put('p','Точность места',p.precision); put('p','События',p.events); put('p','Предания',p.legends);
+  put('d','На руках',d.list); put('d','Самый дальний документ',d.deepest); put('d','Старшие родственники',d.alive);
+  put('r','Форма результата',r.format); put('r','Согласия',r.consents); put('r','Комментарий',r.comment);
+  Object.entries(t.people||{}).forEach(([code,x])=>{
+    R.people[code] = {
+      name:x.name||'', maiden:x.maiden||'', place:x.place||'', life:x.life||'',
+      faith:x.faith||'', proof:x.proof||'', notes:x.notes||'', target:!!x.target,
+      years:[x.birth,x.death].filter(Boolean).join(' – ')
+    };
+  });
+  R.extra = t.extra || '';
+  R.raw = JSON.stringify(o, null, 2);
+  return R;
+}
+
+/* --------------------------- производные поля --------------------------- */
+function zoneLevel(z){
+  const s = String(z||'').toLowerCase();
+  if(s.includes('зел')) return 'green';
+  if(s.includes('жёл')||s.includes('жел')) return 'amber';
+  if(s.includes('крас')) return 'red';
+  return 'grey';
+}
+function deepestGen(people){
+  const ks = Object.keys(people||{});
+  return ks.length ? Math.max(...ks.map(k=>k.length)) : 0;
+}
+function surnames(people){
+  const out = new Set();
+  Object.values(people||{}).forEach(p=>{
+    [String(p.name||''), String(p.maiden||'')].forEach(s=>{
+      const w = s.trim().split(/\s+/)[0].replace(/[,.;()]/g,'');
+      if(w.length>2) out.add(w);
+    });
+  });
+  return [...out];
+}
+function listOf(v){ return String(v||'').split(/[;,]\s*|\n/).map(s=>s.trim()).filter(Boolean); }
+
+function makeRecord(parsed, fileName, fileDate){
+  return {
+    id: 'a' + Math.random().toString(36).slice(2,9) + Date.now().toString(36),
+    file: fileName || '',
+    added: new Date().toISOString(),
+    dated: fileDate || null,
+    data: parsed
+  };
+}
+function fingerprint(p){
+  return [p.c['Имя']||'', p.c['Телефон']||'', p.c['Почта']||'', Object.keys(p.people).length,
+          (p.g['Главный вопрос']||'').slice(0,40)].join('|').toLowerCase().replace(/\s+/g,'');
+}
+
+/* =========================================================================
+   ПРИЁМ ФАЙЛОВ
+   ========================================================================= */
+function ingest(files){
+  const arr = [...files];
+  if(!arr.length) return;
+  let done = 0, added = 0, dup = 0, bad = 0;
+  arr.forEach(f=>{
+    const rd = new FileReader();
+    rd.onload = ()=>{
+      try{
+        const txt = String(rd.result);
+        let parsed = null, many = null;
+        if(/\.json$/i.test(f.name)){
+          const o = JSON.parse(txt);
+          if(Array.isArray(o)) many = o.filter(x=>x && x.data);      // прошлая выгрузка реестра
+          else if(o.c || o.t) parsed = fromDraft(o);                 // черновик анкеты
+        } else {
+          parsed = parseTxt(txt);
+          if(!parsed.c['Имя'] && !Object.keys(parsed.people).length && !parsed.g['Главный вопрос']) parsed = null;
+        }
+        if(many){
+          many.forEach(rec=>{
+            if(DB.some(x=>fingerprint(x.data)===fingerprint(rec.data))){ dup++; return; }
+            if(!rec.id || DB.some(x=>x.id===rec.id)) rec.id = 'a'+Math.random().toString(36).slice(2,9)+Date.now().toString(36);
+            DB.push(rec); added++;
+          });
+        } else if(parsed){
+          if(DB.some(x=>fingerprint(x.data)===fingerprint(parsed))) dup++;
+          else { DB.push(makeRecord(parsed, f.name, f.lastModified ? new Date(f.lastModified).toISOString() : null)); added++; }
+        } else bad++;
+      }catch(e){ bad++; console.error('[реестр] не разобран файл', f.name, e); }
+      if(++done === arr.length){
+        save(); render();
+        const msg = [];
+        if(added) msg.push('добавлено ' + added);
+        if(dup)   msg.push('повторов ' + dup);
+        if(bad)   msg.push('не распознано ' + bad);
+        toast(msg.join(' · ') || 'ничего не добавлено');
+      }
+    };
+    rd.readAsText(f, 'utf-8');
+  });
+}
+
+const drop = $('#drop');
+drop.onclick = ()=>$('#file').click();
+$('#addBtn').onclick = ()=>$('#file').click();
+$('#file').onchange = e=>{ ingest(e.target.files); e.target.value=''; };
+let dragDepth = 0;
+document.addEventListener('dragenter', e=>{ e.preventDefault(); if(++dragDepth) drop.classList.add('hot'); });
+document.addEventListener('dragover',  e=>{ e.preventDefault(); });
+document.addEventListener('dragleave', e=>{ if(--dragDepth<=0){ dragDepth=0; drop.classList.remove('hot'); } });
+document.addEventListener('drop', e=>{
+  e.preventDefault(); dragDepth=0; drop.classList.remove('hot');
+  if(e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) ingest(e.dataTransfer.files);
+});
+
+$('#pasteBtn').onclick = ()=>{
+  const txt = prompt('Вставьте текст заявки целиком:');
+  if(!txt || !txt.trim()) return;
+  const parsed = parseTxt(txt);
+  if(!parsed.c['Имя'] && !Object.keys(parsed.people).length){ toast('Не похоже на заявку'); return; }
+  if(DB.some(x=>fingerprint(x.data)===fingerprint(parsed))){ toast('Такая заявка уже есть'); return; }
+  DB.push(makeRecord(parsed, 'вставлено вручную', null));
+  save(); render(); toast('Добавлено');
+};
+
+/* =========================================================================
+   СВОДКА
+   ========================================================================= */
+function bars(title, pairs, color){
+  if(!pairs.length) return `<div class="card"><h3>${esc(title)}</h3><div class="empty-note">пока пусто</div></div>`;
+  const max = Math.max(...pairs.map(p=>p[1]));
+  return `<div class="card"><h3>${esc(title)}</h3>` + pairs.map(([k,v])=>`
+    <div class="brow">
+      <div class="lbl" title="${esc(k)}">${esc(k)}</div>
+      <div class="num">${v}</div>
+      <div class="track"><div class="fill" style="width:${Math.max(3,Math.round(v/max*100))}%;background:${color||'var(--blue)'}"></div></div>
+    </div>`).join('') + '</div>';
+}
+function tally(fn, limit){
+  const m = new Map();
+  DB.forEach(r=>fn(r.data).forEach(v=>{ if(v) m.set(v, (m.get(v)||0)+1); }));
+  return [...m.entries()].sort((a,b)=>b[1]-a[1] || a[0].localeCompare(b[0])).slice(0, limit||7);
+}
+
+function renderStats(){
+  const n = DB.length;
+  const z = {green:0, amber:0, red:0, grey:0};
+  DB.forEach(r=>z[zoneLevel(r.data.a.zone)]++);
+  const gens = DB.map(r=>deepestGen(r.data.people)).filter(Boolean);
+  const avgGen = gens.length ? gens.reduce((a,b)=>a+b,0)/gens.length : 0;
+  const countries = new Set();
+  DB.forEach(r=>listOf(r.data.p['Страны']).forEach(c=>countries.add(c)));
+
+  $('#stats').innerHTML = `
+    <div class="stat"><div class="k">Всего заявок</div><div class="v">${n}</div></div>
+    <div class="stat z"><div class="k">По зонам</div><div class="v">
+      <span class="zn g" title="зелёная"><i></i>${z.green}</span>
+      <span class="zn a" title="жёлтая"><i></i>${z.amber}</span>
+      <span class="zn r" title="красная"><i></i>${z.red}</span>
+    </div></div>
+    <div class="stat"><div class="k">Средняя глубина</div><div class="v">${avgGen ? avgGen.toFixed(1) : '—'}
+      <small>${avgGen ? plur(Math.round(avgGen),'колено','колена','колен') : ''}</small></div></div>
+    <div class="stat"><div class="k">Стран в заявках</div><div class="v">${countries.size || '—'}</div></div>
+    <div class="stat"><div class="k">Готовы к работе</div><div class="v">${DB.filter(r=>deepestGen(r.data.people)>=3 && listOf(r.data.d['На руках']).length).length}
+      <small>дерево 3+ и документы</small></div></div>`;
+
+  $('#charts').innerHTML =
+    bars('Источник обращения',   tally(d=>listOf(d.c['Источник'])), 'var(--accent)') +
+    bars('Что нужно клиенту',    tally(d=>listOf(d.g['Формат']))) +
+    bars('Страны',               tally(d=>listOf(d.p['Страны'])), 'var(--green)') +
+    bars('Осложняющие события',  tally(d=>listOf(d.p['События'])), 'var(--amber)');
+}
+
+/* =========================================================================
+   СПИСОК
+   ========================================================================= */
+function match(r, q){
+  if(!q) return true;
+  const d = r.data;
+  const hay = [d.c['Имя'], d.c['Город'], d.c['Телефон'], d.c['Почта'], d.c['Источник'],
+               d.g['Главный вопрос'], d.p['Места'], d.p['Страны'], surnames(d.people).join(' ')]
+              .join(' ').toLowerCase();
+  return hay.includes(q.toLowerCase());
+}
+const ZORD = {red:0, amber:1, green:2, grey:3};
+
+function renderList(){
+  const q = $('#q').value.trim(), fz = $('#fz').value, sort = $('#sort').value;
+  const rows = DB.filter(r=>match(r,q) && (!fz || zoneLevel(r.data.a.zone)===fz));
+  rows.sort((a,b)=>{
+    if(sort==='name') return (a.data.c['Имя']||'').localeCompare(b.data.c['Имя']||'');
+    if(sort==='zone') return ZORD[zoneLevel(a.data.a.zone)] - ZORD[zoneLevel(b.data.a.zone)];
+    const t = new Date(a.dated||a.added) - new Date(b.dated||b.added);
+    return sort==='old' ? t : -t;
+  });
+
+  $('#cnt').textContent = DB.length ? `Показано ${rows.length} из ${DB.length}` : '';
+
+  if(!DB.length){
+    $('#list').innerHTML = `<div style="padding:34px 0" class="empty-note">
+      Заявок пока нет. Скачайте файл из Telegram и перетащите его в поле выше.</div>`;
+    return;
+  }
+  if(!rows.length){ $('#list').innerHTML = `<div style="padding:28px 0" class="empty-note">Ничего не найдено.</div>`; return; }
+
+  $('#list').innerHTML = rows.map(r=>{
+    const d = r.data, lvl = zoneLevel(d.a.zone), g = deepestGen(d.people);
+    const sn = surnames(d.people).slice(0,4).join(' · ');
+    const when = new Date(r.dated || r.added);
+    return `<div class="row" data-id="${r.id}">
+      <div>
+        <div class="who">${esc(d.c['Имя'] || 'Без имени')}${d.c['Город']?`<span style="color:var(--ink-3);font-size:14px"> — ${esc(d.c['Город'])}</span>`:''}</div>
+        <div class="sub">${esc(sn || d.g['Главный вопрос'] || '—')}</div>
+      </div>
+      <div class="cell hidem"><span class="cap">Задача</span>${esc((d.g['Формат']||'—').split(';')[0])}</div>
+      <div class="cell hidem"><span class="cap">Оценка</span>${esc(d.a.term || '—')}<br>${esc(d.a.price || '')}</div>
+      <div class="cell">
+        <span class="badge ${lvl}">${esc((d.a.zone||'без оценки').replace(' зона',''))}</span>
+        <div style="margin-top:6px;color:var(--ink-3);font-size:11px">
+          ${g ? g + ' ' + plur(g,'колено','колена','колен') : '—'} · ${when.toLocaleDateString('ru-RU')}
+        </div>
+      </div>
+      <div class="arr">→</div>
+    </div>`;
+  }).join('');
+
+  $$('#list .row').forEach(el=>el.onclick = ()=>openCard(el.dataset.id));
+}
+
+/* =========================================================================
+   КАРТОЧКА ЗАЯВКИ
+   ========================================================================= */
+const SUP = {2:'²',3:'³',4:'⁴',5:'⁵',6:'⁶',7:'⁷',8:'⁸',9:'⁹'};
+function role(code){
+  const g = code.length;
+  if(g===0) return 'Вы';
+  const male = code[g-1]==='F';
+  if(g===1) return male?'Отец':'Мать';
+  const base = male?'дед':'бабушка';
+  const n = g-2;
+  const pre = n===0 ? '' : (n<=3 ? 'пра'.repeat(n) : 'пра'+(SUP[n]||('^'+n)));
+  const w = pre + base;
+  return w.charAt(0).toUpperCase() + w.slice(1);
+}
+
+const ROW=74, COLW=224, CARDW=186;
+function treeHtml(people){
+  const keys = Object.keys(people||{});
+  if(!keys.length) return '<div class="empty-note">Древо не заполнено.</div>';
+
+  const vis = new Set(['']);
+  keys.forEach(k=>{ for(let i=0;i<=k.length;i++) vis.add(k.slice(0,i)); });
+
+  const pos = {}; let cursor = 0;
+  (function place(code){
+    const kids = [code+'F', code+'M'].filter(c=>vis.has(c));
+    if(!kids.length){ pos[code] = {y: cursor + ROW/2}; cursor += ROW; }
+    else { kids.forEach(place); pos[code] = {y:(pos[kids[0]].y + pos[kids[kids.length-1]].y)/2}; }
+    pos[code].x = code.length * COLW;
+  })('');
+
+  const maxG = Math.max(...[...vis].map(c=>c.length));
+  const H = Math.max(cursor, ROW), W = (maxG+1)*COLW - (COLW-CARDW) + 8;
+  let paths = '', nodes = '';
+  [...vis].sort((a,b)=>a.length-b.length).forEach(code=>{
+    const d = people[code], g = code.length, {x,y} = pos[code];
+    const cls = 'node' + (d?'':' empty') + (g===0?' self':'') + (d&&d.target?' target':'') +
+                (g>0 ? (code[g-1]==='F'?' f':' m') : '');
+    const nm = d && d.name ? d.name : '—';
+    const meta = d ? [d.years, d.place].filter(Boolean).join(' · ') : '';
+    nodes += `<div class="${cls}" style="left:${x}px;top:${y-30}px">
+      <div class="role">${esc(role(code))}</div>
+      <div class="nm">${esc(nm)}${d&&d.maiden?` <span style="color:var(--ink-3);font-size:12px">(${esc(d.maiden)})</span>`:''}</div>
+      ${meta?`<div class="meta">${esc(meta)}</div>`:''}
+      ${d&&d.target?`<div class="flag">КЛЮЧЕВАЯ ЛИНИЯ</div>`:''}
+    </div>`;
+    if(g>0){
+      const ch = pos[code.slice(0,-1)];
+      const x1 = ch.x + CARDW, y1 = ch.y, mx = x1 + (x-x1)/2;
+      paths += `<path d="M${x1} ${y1} H${mx} V${y} H${x}" fill="none" stroke="#ddd5c7" stroke-width="1.5"/>`;
+    }
+  });
+  return `<div class="treebox"><div class="stage" style="width:${W}px;height:${H}px">
+    <svg width="${W}" height="${H}">${paths}</svg>${nodes}</div></div>`;
+}
+
+function kvBlock(obj, keys){
+  const out = keys.filter(k=>obj[k]).map(k=>
+    `<div><div class="k">${esc(k)}</div><div class="v">${esc(obj[k])}</div></div>`).join('');
+  return out ? `<div class="kv">${out}</div>` : '<div class="empty-note">не заполнено</div>';
+}
+function tagBlock(v, warn){
+  const l = listOf(v);
+  if(!l.length) return '';
+  return `<div class="tags">${l.map(x=>`<span class="tag${warn?' warn':''}">${esc(x)}</span>`).join('')}</div>`;
+}
+
+function openCard(id){
+  const r = DB.find(x=>x.id===id); if(!r) return;
+  const d = r.data, lvl = zoneLevel(d.a.zone);
+  const phone = (d.c['Телефон']||'').replace(/[^\d+]/g,'');
+  const g = deepestGen(d.people);
+  const when = new Date(r.dated || r.added);
+
+  $('#detailView').innerHTML = `
+    <div class="bar noprint" style="padding:16px 0 0">
+      <button id="back">← К списку</button>
+      <span class="spacer"></span>
+      <button id="prn">Печать</button>
+      <button id="rawBtn">Исходный текст</button>
+      <button class="danger" id="del">Удалить</button>
+    </div>
+
+    <div class="dhead">
+      <div>
+        <h2>${esc(d.c['Имя'] || 'Без имени')}</h2>
+        <div class="meta">
+          ${d.c['Город'] ? esc(d.c['Город']) + ' · ' : ''}${when.toLocaleDateString('ru-RU')}${d.c['Источник'] ? ' · источник: ' + esc(d.c['Источник']) : ''}<br>
+          ${phone ? `<a href="tel:${esc(phone)}">${esc(d.c['Телефон'])}</a>` : ''}
+          ${d.c['Почта'] ? ` · <a href="mailto:${esc(d.c['Почта'])}">${esc(d.c['Почта'])}</a>` : ''}
+          ${d.c['Удобный канал'] ? ` · удобно: ${esc(d.c['Удобный канал'])}` : ''}
+        </div>
+      </div>
+      <div style="text-align:right">
+        <span class="badge ${lvl}">${esc(d.a.zone || 'без оценки')}</span>
+        <div class="meta" style="margin-top:8px">${g ? g + ' ' + plur(g,'колено','колена','колен') + ' известно' : ''}</div>
+      </div>
+    </div>
+
+    ${d.a.zone ? `<div class="sect"><h3>Предварительная оценка</h3>
+      <div class="verdict ${lvl}">
+        <div class="zone">${esc(d.a.zone)}</div>
+        <h4>${esc(d.a.head||'')}</h4>
+        <div class="pair">
+          <div><div class="pk">Срок</div><div style="font-size:15px">${esc(d.a.term||'—')}</div></div>
+          <div><div class="pk">Порядок стоимости</div><div style="font-size:15px">${esc(d.a.price||'—')}</div></div>
+        </div>
+        ${d.a.todo.length ? `<ul>${d.a.todo.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>` : ''}
+      </div></div>` : ''}
+
+    <div class="sect"><h3>Задача</h3>
+      ${tagBlock(d.g['Формат'])}
+      <div style="height:12px"></div>
+      ${kvBlock(d.g, ['Главный вопрос','Срок','Что делали раньше'])}
+    </div>
+
+    <div class="sect"><h3>Древо — то, что клиент знает сам</h3>
+      ${treeHtml(d.people)}
+      ${d.extra ? `<div class="kv" style="margin-top:14px"><div><div class="k">Побочные ветви</div><div class="v">${esc(d.extra)}</div></div></div>` : ''}
+    </div>
+
+    <div class="sect"><h3>География и обстоятельства</h3>
+      ${tagBlock(d.p['Страны'])}
+      ${d.p['События'] ? `<div style="height:8px"></div>${tagBlock(d.p['События'], true)}` : ''}
+      <div style="height:14px"></div>
+      ${kvBlock(d.p, ['Места','Точность места','Предания'])}
+    </div>
+
+    <div class="sect"><h3>Документы</h3>
+      ${tagBlock(d.d['На руках'])}
+      <div style="height:12px"></div>
+      ${kvBlock(d.d, ['Самый дальний документ','Старшие родственники'])}
+    </div>
+
+    <div class="sect"><h3>Результат и согласия</h3>
+      ${tagBlock(d.r['Форма результата'])}
+      <div style="height:12px"></div>
+      ${kvBlock(d.r, ['Согласия','Комментарий'])}
+    </div>
+
+    <div class="sect noprint hidden" id="rawBox"><h3>Исходный файл${r.file?' — '+esc(r.file):''}</h3>
+      <pre class="raw">${esc(d.raw || '')}</pre>
+    </div>`;
+
+  $('#listView').classList.add('off');
+  $('#detailView').classList.add('on');
+  window.scrollTo({top:0});
+
+  $('#back').onclick = closeCard;
+  $('#prn').onclick = ()=>window.print();
+  $('#rawBtn').onclick = ()=>$('#rawBox').classList.toggle('hidden');
+  $('#del').onclick = ()=>{
+    if(!confirm('Удалить заявку «' + (d.c['Имя']||'без имени') + '» из реестра?')) return;
+    DB = DB.filter(x=>x.id!==id); save(); closeCard(); render(); toast('Удалено');
+  };
+  history.replaceState(null, '', '#' + id);
+}
+function closeCard(){
+  $('#detailView').classList.remove('on');
+  $('#listView').classList.remove('off');
+  history.replaceState(null, '', location.pathname + location.search);
+}
+
+/* =========================================================================
+   ВЫГРУЗКИ
+   ========================================================================= */
+function download(name, text, type){
+  const b = new Blob([text], {type: type || 'text/plain;charset=utf-8'});
+  const u = URL.createObjectURL(b);
+  const a = document.createElement('a');
+  a.href = u; a.download = name; a.click();
+  setTimeout(()=>URL.revokeObjectURL(u), 1500);
+}
+$('#expJson').onclick = ()=>{
+  if(!DB.length){ toast('Реестр пуст'); return; }
+  download('реестр-заявок.json', JSON.stringify(DB, null, 2), 'application/json');
+};
+$('#expCsv').onclick = ()=>{
+  if(!DB.length){ toast('Реестр пуст'); return; }
+  const head = ['Дата','Имя','Город','Телефон','Почта','Источник','Канал','Формат','Главный вопрос',
+                'Страны','Места','События','Документы','Зона','Срок','Стоимость','Колен','Фамилии'];
+  const q = s => '"' + String(s==null?'':s).replace(/"/g,'""').replace(/\n/g,' ') + '"';
+  const rows = DB.map(r=>{ const d=r.data; return [
+    new Date(r.dated||r.added).toLocaleDateString('ru-RU'),
+    d.c['Имя'], d.c['Город'], d.c['Телефон'], d.c['Почта'], d.c['Источник'], d.c['Удобный канал'],
+    d.g['Формат'], d.g['Главный вопрос'], d.p['Страны'], d.p['Места'], d.p['События'],
+    d.d['На руках'], d.a.zone, d.a.term, d.a.price, deepestGen(d.people), surnames(d.people).join(' ')
+  ].map(q).join(';'); });
+  download('реестр-заявок.csv', '﻿' + head.map(q).join(';') + '\n' + rows.join('\n'), 'text/csv;charset=utf-8');
+};
+$('#clr').onclick = ()=>{
+  if(!DB.length) return;
+  if(!confirm('Удалить все ' + DB.length + ' ' + plur(DB.length,'заявку','заявки','заявок') +
+              ' из этого браузера?\nСначала лучше выгрузить JSON.')) return;
+  DB = []; save(); render(); toast('Реестр очищен');
+};
+
+/* =========================================================================
+   СТАРТ
+   ========================================================================= */
+function render(){ renderStats(); renderList(); }
+['input','change'].forEach(ev=>{
+  $('#q').addEventListener(ev, renderList);
+  $('#fz').addEventListener(ev, renderList);
+  $('#sort').addEventListener(ev, renderList);
+});
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && $('#detailView').classList.contains('on')) closeCard(); });
+render();
+const hid = location.hash.slice(1);
+if(hid && DB.some(r=>r.id===hid)) openCard(hid);
+</script>
+</body>
+</html>
