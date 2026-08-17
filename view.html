@@ -179,8 +179,10 @@ input[type=search]:focus,select:focus{outline:0;border-color:var(--ink)}
 }
 .node .role{font-size:9px;text-transform:uppercase;letter-spacing:.16em;color:var(--ink-3);
   padding-bottom:4px;margin-bottom:5px;border-bottom:1px solid var(--rule-2);font-weight:600}
-.node .nm{font-family:var(--serif);font-size:13.5px;line-height:1.28}
-.node .meta{font-size:10.5px;color:var(--ink-3);margin-top:3px;line-height:1.35}
+.node .nm{font-family:var(--serif);font-size:13.5px;line-height:1.28;overflow-wrap:anywhere}
+.node .nm .mdn{color:var(--ink-3);font-size:12px}
+.node .meta{font-size:10.5px;color:var(--ink-3);margin-top:3px;line-height:1.35;
+  overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .node.empty{border-style:dashed;border-color:var(--rule-2);background:transparent}
 .node.empty .nm{color:var(--ink-3);font-style:italic;font-size:12.5px}
 .node.self{border-color:var(--ink)}
@@ -664,45 +666,72 @@ function role(code){
   return w.charAt(0).toUpperCase() + w.slice(1);
 }
 
-const ROW=74, COLW=224, CARDW=186;
-function treeHtml(people){
+/* Древо рисуется в два прохода: сначала карточки попадают в DOM, затем по их
+   настоящей высоте считается раскладка. Иначе длинные имена и места наезжают
+   друг на друга — высоту строки заранее не угадать. */
+const COLW=224, CARDW=186, VGAP=14;
+function renderTree(box, people){
   const keys = Object.keys(people||{});
-  if(!keys.length) return '<div class="empty-note">Древо не заполнено.</div>';
+  if(!keys.length){ box.innerHTML = '<div class="empty-note">Древо не заполнено.</div>'; return; }
 
   const vis = new Set(['']);
   keys.forEach(k=>{ for(let i=0;i<=k.length;i++) vis.add(k.slice(0,i)); });
+  const codes = [...vis].sort((a,b)=>a.length-b.length || a.localeCompare(b));
 
-  const pos = {}; let cursor = 0;
+  const stage = document.createElement('div');
+  stage.className = 'stage';
+  const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+  stage.appendChild(svg);
+
+  const el = {};
+  codes.forEach(code=>{
+    const d = people[code], g = code.length;
+    const n = document.createElement('div');
+    n.className = 'node' + (d?'':' empty') + (g===0?' self':'') + (d&&d.target?' target':'') +
+                  (g>0 ? (code[g-1]==='F'?' f':' m') : '');
+    n.style.left = (g * COLW) + 'px';
+    const meta = d ? [d.years, d.place].filter(Boolean).join(' · ') : '';
+    n.innerHTML = `<div class="role">${esc(role(code))}</div>
+      <div class="nm">${esc(d && d.name ? d.name : '—')}${d&&d.maiden?` <span class="mdn">(${esc(d.maiden)})</span>`:''}</div>
+      ${meta?`<div class="meta" title="${esc(meta)}">${esc(meta)}</div>`:''}
+      ${d&&d.target?`<div class="flag">КЛЮЧЕВАЯ ЛИНИЯ</div>`:''}`;
+    el[code] = n;
+    stage.appendChild(n);
+  });
+
+  box.innerHTML = '';
+  box.appendChild(stage);
+
+  const h = {};
+  codes.forEach(c=>{ h[c] = el[c].offsetHeight || 56; });          // замер после вставки
+
+  const mid = {}; let cursor = 0;
   (function place(code){
     const kids = [code+'F', code+'M'].filter(c=>vis.has(c));
-    if(!kids.length){ pos[code] = {y: cursor + ROW/2}; cursor += ROW; }
-    else { kids.forEach(place); pos[code] = {y:(pos[kids[0]].y + pos[kids[kids.length-1]].y)/2}; }
-    pos[code].x = code.length * COLW;
+    if(!kids.length){ mid[code] = cursor + h[code]/2; cursor += h[code] + VGAP; }
+    else { kids.forEach(place); mid[code] = (mid[kids[0]] + mid[kids[kids.length-1]]) / 2; }
   })('');
 
-  const maxG = Math.max(...[...vis].map(c=>c.length));
-  const H = Math.max(cursor, ROW), W = (maxG+1)*COLW - (COLW-CARDW) + 8;
-  let paths = '', nodes = '';
-  [...vis].sort((a,b)=>a.length-b.length).forEach(code=>{
-    const d = people[code], g = code.length, {x,y} = pos[code];
-    const cls = 'node' + (d?'':' empty') + (g===0?' self':'') + (d&&d.target?' target':'') +
-                (g>0 ? (code[g-1]==='F'?' f':' m') : '');
-    const nm = d && d.name ? d.name : '—';
-    const meta = d ? [d.years, d.place].filter(Boolean).join(' · ') : '';
-    nodes += `<div class="${cls}" style="left:${x}px;top:${y-30}px">
-      <div class="role">${esc(role(code))}</div>
-      <div class="nm">${esc(nm)}${d&&d.maiden?` <span style="color:var(--ink-3);font-size:12px">(${esc(d.maiden)})</span>`:''}</div>
-      ${meta?`<div class="meta">${esc(meta)}</div>`:''}
-      ${d&&d.target?`<div class="flag">КЛЮЧЕВАЯ ЛИНИЯ</div>`:''}
-    </div>`;
-    if(g>0){
-      const ch = pos[code.slice(0,-1)];
-      const x1 = ch.x + CARDW, y1 = ch.y, mx = x1 + (x-x1)/2;
-      paths += `<path d="M${x1} ${y1} H${mx} V${y} H${x}" fill="none" stroke="#ddd5c7" stroke-width="1.5"/>`;
-    }
+  let shift = 0;
+  codes.forEach(c=>{ shift = Math.max(shift, h[c]/2 - mid[c]); });  // родитель выше своих детей
+  let bottom = 0;
+  codes.forEach(c=>{
+    const top = mid[c] + shift - h[c]/2;
+    el[c].style.top = top + 'px';
+    bottom = Math.max(bottom, top + h[c]);
   });
-  return `<div class="treebox"><div class="stage" style="width:${W}px;height:${H}px">
-    <svg width="${W}" height="${H}">${paths}</svg>${nodes}</div></div>`;
+
+  const maxG = Math.max(...codes.map(c=>c.length));
+  const W = maxG * COLW + CARDW + 8, H = bottom + 4;
+  stage.style.width = W + 'px';
+  stage.style.height = H + 'px';
+  svg.setAttribute('width', W); svg.setAttribute('height', H);
+  svg.innerHTML = codes.filter(c=>c.length).map(code=>{
+    const p = code.slice(0,-1);
+    const x1 = (code.length-1)*COLW + CARDW, y1 = mid[p] + shift;
+    const x2 = code.length*COLW,             y2 = mid[code] + shift;
+    return `<path d="M${x1} ${y1} H${x1+(x2-x1)/2} V${y2} H${x2}" fill="none" stroke="#ddd5c7" stroke-width="1.5"/>`;
+  }).join('');
 }
 
 function kvBlock(obj, keys){
@@ -766,7 +795,7 @@ function openCard(id){
     </div>
 
     <div class="sect"><h3>Древо — то, что клиент знает сам</h3>
-      ${treeHtml(d.people)}
+      <div class="treebox" id="treeBox"></div>
       ${d.extra ? `<div class="kv" style="margin-top:14px"><div><div class="k">Побочные ветви</div><div class="v">${esc(d.extra)}</div></div></div>` : ''}
     </div>
 
@@ -795,6 +824,7 @@ function openCard(id){
 
   $('#listView').classList.add('off');
   $('#detailView').classList.add('on');
+  renderTree($('#treeBox'), d.people);        // только после показа: нужен замер высот
   window.scrollTo({top:0});
 
   $('#back').onclick = closeCard;
